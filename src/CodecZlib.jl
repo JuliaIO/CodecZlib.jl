@@ -21,8 +21,8 @@ import Libz
 import TranscodingStreams:
     TranscodingStreams,
     Codec,
-    ReadMode,
-    WriteMode,
+    Read,
+    Write,
     ProcCode,
     PROC_OK,
     PROC_FINISH,

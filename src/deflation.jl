@@ -3,7 +3,7 @@
 
 const DeflationCodec = Union{GzipDeflation,ZlibDeflation,RawDeflation}
 
-function process(::Type{ReadMode}, codec::DeflationCodec, source::IO, output::Ptr{UInt8}, nbytes::Int)::Tuple{Int,ProcCode}
+function process(::Type{Read}, codec::DeflationCodec, source::IO, output::Ptr{UInt8}, nbytes::Int)::Tuple{Int,ProcCode}
     # fill buffer
     state = codec.state
     if state.position == state.fposition
@@ -33,7 +33,7 @@ function process(::Type{ReadMode}, codec::DeflationCodec, source::IO, output::Pt
     end
 end
 
-function process(::Type{WriteMode}, codec::DeflationCodec, sink::IO, input::Ptr{UInt8}, nbytes::Int)::Tuple{Int,ProcCode}
+function process(::Type{Write}, codec::DeflationCodec, sink::IO, input::Ptr{UInt8}, nbytes::Int)::Tuple{Int,ProcCode}
     # flush buffer
     state = codec.state
     state.position += unsafe_write(sink, bufferptr(state), buffersize(state))
@@ -62,7 +62,7 @@ function process(::Type{WriteMode}, codec::DeflationCodec, sink::IO, input::Ptr{
     end
 end
 
-function finish(::Type{WriteMode}, codec::DeflationCodec, sink::IO)
+function finish(::Type{Write}, codec::DeflationCodec, sink::IO)
     state = codec.state
     zstream = codec.zstream
     zstream.avail_in = 0
