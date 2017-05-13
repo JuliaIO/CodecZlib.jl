@@ -2,39 +2,30 @@ module CodecZlib
 
 export
     # gzip
-    GzipInflation,
-    GzipInflationStream,
-    GzipDeflation,
-    GzipDeflationStream,
-    # zlib
-    ZlibInflation,
-    ZlibInflationStream,
-    ZlibDeflation,
-    ZlibDeflationStream,
-    # raw
-    RawInflation,
-    RawInflationStream,
-    RawDeflation,
-    RawDeflationStream
+    GzipCompression,
+    GzipCompressionStream,
+    GzipDecompression,
+    GzipDecompressionStream,
 
-import Libz
+    # zlib
+    ZlibCompression,
+    ZlibCompressionStream,
+    ZlibDecompression,
+    ZlibDecompressionStream,
+
+    # raw
+    RawCompression,
+    RawCompressionStream,
+    RawDecompression,
+    RawDecompressionStream
+
 import TranscodingStreams:
     TranscodingStreams,
-    Codec,
-    Read,
-    Write,
-    ProcCode,
-    PROC_OK,
-    PROC_FINISH,
     TranscodingStream,
-    process,
-    finish
+    Memory
 
-include("state.jl")
-include("raw.jl")
-include("zlib.jl")
-include("gzip.jl")
-include("inflation.jl")
-include("deflation.jl")
+include("zstream.jl")
+include("compression.jl")
+include("decompression.jl")
 
 end # module
