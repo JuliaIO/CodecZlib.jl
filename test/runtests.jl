@@ -1,6 +1,6 @@
 using CodecZlib
 using Base.Test
-import TranscodingStreams: test_roundtrip_read, test_roundtrip_write
+import TranscodingStreams: test_roundtrip_read, test_roundtrip_write, test_roundtrip_transcode
 
 const testdir = dirname(@__FILE__)
 
@@ -55,6 +55,7 @@ const testdir = dirname(@__FILE__)
 
     test_roundtrip_read(GzipCompressionStream, GzipDecompressionStream)
     test_roundtrip_write(GzipCompressionStream, GzipDecompressionStream)
+    test_roundtrip_transcode(GzipCompression, GzipDecompression)
 end
 
 @testset "Zlib Codec" begin
@@ -99,9 +100,11 @@ end
 
     test_roundtrip_read(ZlibCompressionStream, ZlibDecompressionStream)
     test_roundtrip_write(ZlibCompressionStream, ZlibDecompressionStream)
+    test_roundtrip_transcode(ZlibCompression, ZlibDecompression)
 end
 
 @testset "Raw Codec" begin
     test_roundtrip_read(RawCompressionStream, RawDecompressionStream)
     test_roundtrip_write(RawCompressionStream, RawDecompressionStream)
+    test_roundtrip_transcode(RawCompression, RawDecompression)
 end
