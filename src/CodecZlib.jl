@@ -24,7 +24,7 @@ import TranscodingStreams:
     TranscodingStream,
     Memory
 
-include("zstream.jl")
+include("libz.jl")
 include("compression.jl")
 include("decompression.jl")
 

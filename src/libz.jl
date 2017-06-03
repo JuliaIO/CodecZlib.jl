@@ -1,5 +1,5 @@
-# Zlib Stream
-# ===========
+# Libz Interfaces
+# ===============
 
 type ZStream
     next_in::Ptr{UInt8}
