@@ -16,7 +16,7 @@ end
 """
     GzipCompression(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_WINDOWBITS))
 
-Create a new gzip compression codec.
+Create a gzip compression codec.
 """
 function GzipCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
@@ -30,6 +30,11 @@ end
 
 const GzipCompressionStream{S} = TranscodingStream{GzipCompression,S} where S<:IO
 
+"""
+    GzipCompressionStream(stream::IO)
+
+Create a gzip compression stream.
+"""
 function GzipCompressionStream(stream::IO)
     return TranscodingStream(GzipCompression(), stream)
 end
@@ -47,7 +52,7 @@ end
 """
     ZlibCompression(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_WINDOWBITS))
 
-Create a new zlib compression codec.
+Create a zlib compression codec.
 """
 function ZlibCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
@@ -61,6 +66,11 @@ end
 
 const ZlibCompressionStream{S} = TranscodingStream{ZlibCompression,S} where S<:IO
 
+"""
+    ZlibCompressionStream(stream::IO)
+
+Create a zlib compression stream.
+"""
 function ZlibCompressionStream(stream::IO)
     return TranscodingStream(ZlibCompression(), stream)
 end
@@ -78,7 +88,7 @@ end
 """
     RawCompression(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_COMPRESSION))
 
-Create a new raw compression codec.
+Create a raw compression codec.
 """
 function RawCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
                         windowbits::Integer=Z_DEFAULT_WINDOWBITS)
@@ -92,6 +102,11 @@ end
 
 const RawCompressionStream{S} = TranscodingStream{RawCompression,S} where S<:IO
 
+"""
+    RawCompressionStream(stream::IO)
+
+Create a raw compression stream.
+"""
 function RawCompressionStream(stream::IO)
     return TranscodingStream(RawCompression(), stream)
 end
