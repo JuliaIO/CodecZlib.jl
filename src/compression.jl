@@ -118,16 +118,23 @@ end
 function TranscodingStreams.initialize(codec::CompressionCodec)
     code = deflate_init!(codec.zstream, codec.level, codec.windowbits)
     if code != Z_OK
-        zerror(zstream, code)
+        zerror(codec.zstream, code)
     end
-    finalizer(codec.zstream, deflate_end!)
+    finalizer(codec.zstream, free_deflate!)
     return
 end
 
 function TranscodingStreams.finalize(codec::CompressionCodec)
-    code = deflate_end!(codec.zstream)
-    if code != Z_OK
-        zerror(codec.zstream, code)
+    free_deflate!(codec.zstream)
+end
+
+# Free zstream if needed.
+function free_deflate!(zstream::ZStream)
+    if zstream.state != C_NULL
+        code = deflate_end!(zstream)
+        if code != Z_OK
+            zerror(zstream, code)
+        end
     end
     return
 end

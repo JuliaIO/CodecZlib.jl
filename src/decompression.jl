@@ -93,14 +93,21 @@ function TranscodingStreams.initialize(codec::DecompressionCodec)
     if code != Z_OK
         zerror(codec.zstream, code)
     end
-    finalizer(codec.zstream, inflate_end!)
+    finalizer(codec.zstream, free_inflate!)
     return
 end
 
 function TranscodingStreams.finalize(codec::DecompressionCodec)
-    code = inflate_end!(codec.zstream)
-    if code != Z_OK
-        zerror(codec.zstream, code)
+    free_inflate!(codec.zstream)
+end
+
+# Free zstream if needed.
+function free_inflate!(zstream::ZStream)
+    if zstream.state != C_NULL
+        code = inflate_end!(zstream)
+        if code != Z_OK
+            zerror(zstream, code)
+        end
     end
     return
 end
