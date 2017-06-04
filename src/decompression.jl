@@ -26,6 +26,11 @@ end
 
 const GzipDecompressionStream{S} = TranscodingStream{GzipDecompression,S} where S<:IO
 
+"""
+    GzipDecompressionStream(stream::IO)
+
+Create a gzip decompression stream.
+"""
 function GzipDecompressionStream(stream::IO)
     return TranscodingStream(GzipDecompression(), stream)
 end
@@ -53,35 +58,45 @@ end
 
 const ZlibDecompressionStream{S} = TranscodingStream{ZlibDecompression,S} where S<:IO
 
+"""
+    ZlibDecompressionStream(stream::IO)
+
+Create a deflate decompression stream.
+"""
 function ZlibDecompressionStream(stream::IO)
     return TranscodingStream(ZlibDecompression(), stream)
 end
 
 
-# Raw
-# ---
+# Deflate
+# -------
 
-struct RawDecompression <: DecompressionCodec
+struct DeflateDecompression <: DecompressionCodec
     zstream::ZStream
     windowbits::Int
 end
 
 """
-    RawDecompression(;windowbits=$(Z_DEFAULT_WINDOWBITS))
+    DeflateDecompression(;windowbits=$(Z_DEFAULT_WINDOWBITS))
 
-Create a new raw decompression codec.
+Create a new deflate decompression codec.
 """
-function RawDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
+function DeflateDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(8 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 8..15"))
     end
-    return RawDecompression(ZStream(), -Int(windowbits))
+    return DeflateDecompression(ZStream(), -Int(windowbits))
 end
 
-const RawDecompressionStream{S} = TranscodingStream{RawDecompression,S} where S<:IO
+const DeflateDecompressionStream{S} = TranscodingStream{DeflateDecompression,S} where S<:IO
 
-function RawDecompressionStream(stream::IO)
-    return TranscodingStream(RawDecompression(), stream)
+"""
+    DeflateDecompressionStream(stream::IO)
+
+Create a deflate decompression stream.
+"""
+function DeflateDecompressionStream(stream::IO)
+    return TranscodingStream(DeflateDecompression(), stream)
 end
 
 

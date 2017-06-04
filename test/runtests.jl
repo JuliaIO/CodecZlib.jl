@@ -103,8 +103,8 @@ end
     test_roundtrip_transcode(ZlibCompression, ZlibDecompression)
 end
 
-@testset "Raw Codec" begin
-    test_roundtrip_read(RawCompressionStream, RawDecompressionStream)
-    test_roundtrip_write(RawCompressionStream, RawDecompressionStream)
-    test_roundtrip_transcode(RawCompression, RawDecompression)
+@testset "Deflate Codec" begin
+    test_roundtrip_read(DeflateCompressionStream, DeflateDecompressionStream)
+    test_roundtrip_write(DeflateCompressionStream, DeflateDecompressionStream)
+    test_roundtrip_transcode(DeflateCompression, DeflateDecompression)
 end

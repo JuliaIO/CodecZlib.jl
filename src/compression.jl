@@ -76,39 +76,39 @@ function ZlibCompressionStream(stream::IO)
 end
 
 
-# Raw
-# ---
+# Deflate
+# -------
 
-struct RawCompression <: CompressionCodec
+struct DeflateCompression <: CompressionCodec
     zstream::ZStream
     level::Int
     windowbits::Int
 end
 
 """
-    RawCompression(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_COMPRESSION))
+    DeflateCompression(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_COMPRESSION))
 
-Create a raw compression codec.
+Create a deflate compression codec.
 """
-function RawCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
+function DeflateCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
                         windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(-1 ≤ level ≤ 9)
         throw(ArgumentError("compression level must be within -1..9"))
     elseif !(8 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 8..15"))
     end
-    return RawCompression(ZStream(), level, -Int(windowbits))
+    return DeflateCompression(ZStream(), level, -Int(windowbits))
 end
 
-const RawCompressionStream{S} = TranscodingStream{RawCompression,S} where S<:IO
+const DeflateCompressionStream{S} = TranscodingStream{DeflateCompression,S} where S<:IO
 
 """
-    RawCompressionStream(stream::IO)
+    DeflateCompressionStream(stream::IO)
 
-Create a raw compression stream.
+Create a deflate compression stream.
 """
-function RawCompressionStream(stream::IO)
-    return TranscodingStream(RawCompression(), stream)
+function DeflateCompressionStream(stream::IO)
+    return TranscodingStream(DeflateCompression(), stream)
 end
 
 

@@ -13,11 +13,11 @@ export
     ZlibDecompression,
     ZlibDecompressionStream,
 
-    # raw
-    RawCompression,
-    RawCompressionStream,
-    RawDecompression,
-    RawDecompressionStream
+    # deflate
+    DeflateCompression,
+    DeflateCompressionStream,
+    DeflateDecompression,
+    DeflateDecompressionStream
 
 import TranscodingStreams:
     TranscodingStreams,
