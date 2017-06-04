@@ -15,7 +15,11 @@ end
 """
     GzipDecompression(;windowbits=$(Z_DEFAULT_WINDOWBITS), gziponly=false)
 
-Create a new gzip decompressor codec.
+Create a gzip decompressor codec.
+
+This codec detects the compression format (gzip or zlib) from data when
+`gziponly` is `false`. Setting `gziponly` to `true` will turn off this format
+detection and throw an exception if data are not formatted in gzip.
 """
 function GzipDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS, gziponly::Bool=false)
     if !(8 ≤ windowbits ≤ 15)
@@ -47,7 +51,7 @@ end
 """
     ZlibDecompression(;windowbits=$(Z_DEFAULT_WINDOWBITS))
 
-Create a new zlib decompression codec.
+Create a zlib decompression codec.
 """
 function ZlibDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(8 ≤ windowbits ≤ 15)
@@ -79,7 +83,7 @@ end
 """
     DeflateDecompression(;windowbits=$(Z_DEFAULT_WINDOWBITS))
 
-Create a new deflate decompression codec.
+Create a deflate decompression codec.
 """
 function DeflateDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(8 ≤ windowbits ≤ 15)

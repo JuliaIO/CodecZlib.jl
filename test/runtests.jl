@@ -1,6 +1,6 @@
 using CodecZlib
 using Base.Test
-import TranscodingStreams: test_roundtrip_read, test_roundtrip_write, test_roundtrip_transcode
+import TranscodingStreams: TranscodingStream, test_roundtrip_read, test_roundtrip_write, test_roundtrip_transcode
 
 const testdir = dirname(@__FILE__)
 
@@ -16,6 +16,14 @@ const testdir = dirname(@__FILE__)
     @test close(stream) === nothing
     @test !isopen(stream)
     @test !isopen(file)
+
+    stream = TranscodingStream(GzipDecompression(gziponly=false), IOBuffer(gzip_data))
+    @test read(stream) == b"foo"
+    close(stream)
+
+    stream = TranscodingStream(GzipDecompression(gziponly=true), IOBuffer(gzip_data))
+    @test read(stream) == b"foo"
+    close(stream)
 
     file = IOBuffer(vcat(gzip_data, gzip_data))
     stream = GzipDecompressionStream(file)
@@ -70,6 +78,14 @@ end
     @test close(stream) === nothing
     @test !isopen(stream)
     @test !isopen(file)
+
+    stream = TranscodingStream(GzipDecompression(gziponly=false), IOBuffer(zlib_data))
+    @test read(stream) == b"foo"
+    close(stream)
+
+    stream = TranscodingStream(GzipDecompression(gziponly=true), IOBuffer(zlib_data))
+    @test_throws Exception read(stream)
+    close(stream)
 
     file = IOBuffer(b"foo")
     stream = ZlibCompressionStream(file)
