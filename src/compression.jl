@@ -9,6 +9,8 @@ abstract type CompressionCodec <: TranscodingStreams.Codec end
 
 struct GzipCompression <: CompressionCodec
     zstream::ZStream
+    level::Int
+    windowbits::Int
 end
 
 """
@@ -23,12 +25,7 @@ function GzipCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
     elseif !(8 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 8..15"))
     end
-    zstream = ZStream()
-    code = deflate_init!(zstream, level, windowbits+16)
-    if code != Z_OK
-        zerror(zstream, code)
-    end
-    return GzipCompression(zstream)
+    return GzipCompression(ZStream(), level, windowbits+16)
 end
 
 const GzipCompressionStream{S} = TranscodingStream{GzipCompression,S} where S<:IO
@@ -43,6 +40,8 @@ end
 
 struct ZlibCompression <: CompressionCodec
     zstream::ZStream
+    level::Int
+    windowbits::Int
 end
 
 """
@@ -57,12 +56,7 @@ function ZlibCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
     elseif !(8 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 8..15"))
     end
-    zstream = ZStream()
-    code = deflate_init!(zstream, level, windowbits)
-    if code != Z_OK
-        zerror(zstream, code)
-    end
-    return ZlibCompression(zstream)
+    return ZlibCompression(ZStream(), level, windowbits)
 end
 
 const ZlibCompressionStream{S} = TranscodingStream{ZlibCompression,S} where S<:IO
@@ -77,6 +71,8 @@ end
 
 struct RawCompression <: CompressionCodec
     zstream::ZStream
+    level::Int
+    windowbits::Int
 end
 
 """
@@ -91,12 +87,7 @@ function RawCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
     elseif !(8 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 8..15"))
     end
-    zstream = ZStream()
-    code = deflate_init!(zstream, level, -Int(windowbits))
-    if code != Z_OK
-        zerror(zstream, code)
-    end
-    return RawCompression(zstream)
+    return RawCompression(ZStream(), level, -Int(windowbits))
 end
 
 const RawCompressionStream{S} = TranscodingStream{RawCompression,S} where S<:IO
@@ -108,6 +99,22 @@ end
 
 # Methods
 # -------
+
+function TranscodingStreams.initialize(codec::CompressionCodec)
+    code = deflate_init!(codec.zstream, codec.level, codec.windowbits)
+    if code != Z_OK
+        zerror(zstream, code)
+    end
+    return
+end
+
+function TranscodingStreams.finalize(codec::CompressionCodec)
+    code = deflate_end!(codec.zstream)
+    if code != Z_OK
+        zerror(codec.zstream, code)
+    end
+    return
+end
 
 function TranscodingStreams.startproc(codec::CompressionCodec)
     code = deflate_reset!(codec.zstream)
@@ -133,12 +140,4 @@ function TranscodingStreams.process(codec::CompressionCodec, input::Memory, outp
     else
         zerror(zstream, code)
     end
-end
-
-function TranscodingStreams.finalize(codec::CompressionCodec)
-    code = deflate_end!(codec.zstream)
-    if code != Z_OK
-        zerror(codec.zstream, code)
-    end
-    return
 end
