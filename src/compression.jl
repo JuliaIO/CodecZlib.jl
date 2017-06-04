@@ -105,6 +105,7 @@ function TranscodingStreams.initialize(codec::CompressionCodec)
     if code != Z_OK
         zerror(zstream, code)
     end
+    finalizer(codec.zstream, deflate_end!)
     return
 end
 
