@@ -64,6 +64,10 @@ const testdir = dirname(@__FILE__)
     test_roundtrip_read(GzipCompressionStream, GzipDecompressionStream)
     test_roundtrip_write(GzipCompressionStream, GzipDecompressionStream)
     test_roundtrip_transcode(GzipCompression, GzipDecompression)
+
+    @test_throws ArgumentError GzipCompression(level=10)
+    @test_throws ArgumentError GzipCompression(windowbits=16)
+    @test_throws ArgumentError GzipDecompression(windowbits=16)
 end
 
 @testset "Zlib Codec" begin
@@ -117,10 +121,18 @@ end
     test_roundtrip_read(ZlibCompressionStream, ZlibDecompressionStream)
     test_roundtrip_write(ZlibCompressionStream, ZlibDecompressionStream)
     test_roundtrip_transcode(ZlibCompression, ZlibDecompression)
+
+    @test_throws ArgumentError ZlibCompression(level=10)
+    @test_throws ArgumentError ZlibCompression(windowbits=16)
+    @test_throws ArgumentError ZlibDecompression(windowbits=16)
 end
 
 @testset "Deflate Codec" begin
     test_roundtrip_read(DeflateCompressionStream, DeflateDecompressionStream)
     test_roundtrip_write(DeflateCompressionStream, DeflateDecompressionStream)
     test_roundtrip_transcode(DeflateCompression, DeflateDecompression)
+
+    @test_throws ArgumentError DeflateCompression(level=10)
+    @test_throws ArgumentError DeflateCompression(windowbits=16)
+    @test_throws ArgumentError DeflateDecompression(windowbits=16)
 end
