@@ -1,8 +1,8 @@
 # CodecZlib.jl
 
 <!--[![Docs Latest][docs-latest-img]][docs-latest-url]-->
-[![TravisCI Status][travisci-img]][travisci-url]
 <!--[![Appveyor Status][appveyor-img]][appveyor-url]-->
+[![TravisCI Status][travisci-img]][travisci-url]
 [![codecov.io][codecov-img]][codecov-url]
 
 See [TranscodingStreams.jl](https://github.com/bicycle1885/TranscodingStreams.jl) for details.
