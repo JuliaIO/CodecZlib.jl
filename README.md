@@ -5,7 +5,18 @@
 [![TravisCI Status][travisci-img]][travisci-url]
 [![codecov.io][codecov-img]][codecov-url]
 
-See [TranscodingStreams.jl](https://github.com/bicycle1885/TranscodingStreams.jl) for details.
+This package exports following codecs and streams:
+
+| Codec                  | Stream                       |
+| ---------------------- | ---------------------------- |
+| `GzipCompression`      | `GzipCompressionStream`      |
+| `GzipDecompression`    | `GzipDecompressionStream`    |
+| `ZlibCompression`      | `ZlibCompressionStream`      |
+| `ZlibDecompression`    | `ZlibDecompressionStream`    |
+| `DeflateCompression`   | `DeflateCompressionStream`   |
+| `DeflateDecompression` | `DeflateDecompressionStream` |
+
+See docstrings and [TranscodingStreams.jl](https://github.com/bicycle1885/TranscodingStreams.jl) for details.
 
 [travisci-img]: https://travis-ci.org/bicycle1885/CodecZlib.jl.svg?branch=master
 [travisci-url]: https://travis-ci.org/bicycle1885/CodecZlib.jl
