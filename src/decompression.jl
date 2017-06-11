@@ -31,7 +31,7 @@ function GzipDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS, gziponly::
     return GzipDecompression(ZStream(), windowbits+(gziponly?16:32))
 end
 
-const GzipDecompressionStream{S} = TranscodingStream{GzipDecompression,S}
+const GzipDecompressionStream{S} = TranscodingStream{GzipDecompression,S} where S<:IO
 
 """
     GzipDecompressionStream(stream::IO; kwargs...)
@@ -67,7 +67,7 @@ function ZlibDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     return ZlibDecompression(ZStream(), windowbits)
 end
 
-const ZlibDecompressionStream{S} = TranscodingStream{ZlibDecompression,S}
+const ZlibDecompressionStream{S} = TranscodingStream{ZlibDecompression,S} where S<:IO
 
 """
     ZlibDecompressionStream(stream::IO; kwargs...)
@@ -103,7 +103,7 @@ function DeflateDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     return DeflateDecompression(ZStream(), -Int(windowbits))
 end
 
-const DeflateDecompressionStream{S} = TranscodingStream{DeflateDecompression,S}
+const DeflateDecompressionStream{S} = TranscodingStream{DeflateDecompression,S} where S<:IO
 
 """
     DeflateDecompressionStream(stream::IO; kwargs...)

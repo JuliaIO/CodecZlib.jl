@@ -66,6 +66,9 @@ const testdir = dirname(@__FILE__)
         @test length(read(path)) > 0
     end
 
+    @test GzipCompressionStream <: TranscodingStream
+    @test GzipDecompressionStream <: TranscodingStream
+
     test_roundtrip_read(GzipCompressionStream, GzipDecompressionStream)
     test_roundtrip_write(GzipCompressionStream, GzipDecompressionStream)
     test_roundtrip_lines(GzipCompressionStream, GzipDecompressionStream)
@@ -124,6 +127,9 @@ end
         @test read(path) == zlib_data
     end
 
+    @test ZlibCompressionStream <: TranscodingStream
+    @test ZlibDecompressionStream <: TranscodingStream
+
     test_roundtrip_read(ZlibCompressionStream, ZlibDecompressionStream)
     test_roundtrip_write(ZlibCompressionStream, ZlibDecompressionStream)
     test_roundtrip_lines(ZlibCompressionStream, ZlibDecompressionStream)
@@ -139,6 +145,9 @@ end
     test_roundtrip_write(DeflateCompressionStream, DeflateDecompressionStream)
     test_roundtrip_lines(DeflateCompressionStream, DeflateDecompressionStream)
     test_roundtrip_transcode(DeflateCompression, DeflateDecompression)
+
+    @test DeflateCompressionStream <: TranscodingStream
+    @test DeflateDecompressionStream <: TranscodingStream
 
     @test_throws ArgumentError DeflateCompression(level=10)
     @test_throws ArgumentError DeflateCompression(windowbits=16)
