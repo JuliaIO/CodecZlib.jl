@@ -1,6 +1,11 @@
 using CodecZlib
 using Base.Test
-import TranscodingStreams: TranscodingStream, test_roundtrip_read, test_roundtrip_write, test_roundtrip_transcode
+import TranscodingStreams:
+    TranscodingStream,
+    test_roundtrip_read,
+    test_roundtrip_write,
+    test_roundtrip_lines,
+    test_roundtrip_transcode
 
 const testdir = dirname(@__FILE__)
 
@@ -63,6 +68,7 @@ const testdir = dirname(@__FILE__)
 
     test_roundtrip_read(GzipCompressionStream, GzipDecompressionStream)
     test_roundtrip_write(GzipCompressionStream, GzipDecompressionStream)
+    test_roundtrip_lines(GzipCompressionStream, GzipDecompressionStream)
     test_roundtrip_transcode(GzipCompression, GzipDecompression)
 
     @test_throws ArgumentError GzipCompression(level=10)
@@ -120,6 +126,7 @@ end
 
     test_roundtrip_read(ZlibCompressionStream, ZlibDecompressionStream)
     test_roundtrip_write(ZlibCompressionStream, ZlibDecompressionStream)
+    test_roundtrip_lines(ZlibCompressionStream, ZlibDecompressionStream)
     test_roundtrip_transcode(ZlibCompression, ZlibDecompression)
 
     @test_throws ArgumentError ZlibCompression(level=10)
@@ -130,6 +137,7 @@ end
 @testset "Deflate Codec" begin
     test_roundtrip_read(DeflateCompressionStream, DeflateDecompressionStream)
     test_roundtrip_write(DeflateCompressionStream, DeflateDecompressionStream)
+    test_roundtrip_lines(DeflateCompressionStream, DeflateDecompressionStream)
     test_roundtrip_transcode(DeflateCompression, DeflateDecompression)
 
     @test_throws ArgumentError DeflateCompression(level=10)
