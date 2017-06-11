@@ -17,9 +17,12 @@ end
 
 Create a gzip decompressor codec.
 
-This codec detects the compression format (gzip or zlib) from data when
-`gziponly` is `false`. Setting `gziponly` to `true` will turn off this format
-detection and throw an exception if data are not formatted in gzip.
+If `gziponly` is `false`, this codec can decompress the zlib format as well.
+
+Arguments
+---------
+- `windowbits`: size of history buffer (8..15)
+- `gziponly`: flag to inactivate data format detection
 """
 function GzipDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS, gziponly::Bool=false)
     if !(8 ≤ windowbits ≤ 15)
@@ -31,12 +34,12 @@ end
 const GzipDecompressionStream{S} = TranscodingStream{GzipDecompression,S}
 
 """
-    GzipDecompressionStream(stream::IO)
+    GzipDecompressionStream(stream::IO; kwargs...)
 
-Create a gzip decompression stream.
+Create a gzip decompression stream (see `GzipDecompression` for `kwargs`).
 """
-function GzipDecompressionStream(stream::IO)
-    return TranscodingStream(GzipDecompression(), stream)
+function GzipDecompressionStream(stream::IO; kwargs...)
+    return TranscodingStream(GzipDecompression(;kwargs...), stream)
 end
 
 
@@ -52,6 +55,10 @@ end
     ZlibDecompression(;windowbits=$(Z_DEFAULT_WINDOWBITS))
 
 Create a zlib decompression codec.
+
+Arguments
+---------
+- `windowbits`: size of history buffer (8..15)
 """
 function ZlibDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(8 ≤ windowbits ≤ 15)
@@ -63,12 +70,12 @@ end
 const ZlibDecompressionStream{S} = TranscodingStream{ZlibDecompression,S}
 
 """
-    ZlibDecompressionStream(stream::IO)
+    ZlibDecompressionStream(stream::IO; kwargs...)
 
-Create a deflate decompression stream.
+Create a deflate decompression stream (see `ZlibDecompression` for `kwargs`).
 """
-function ZlibDecompressionStream(stream::IO)
-    return TranscodingStream(ZlibDecompression(), stream)
+function ZlibDecompressionStream(stream::IO; kwargs...)
+    return TranscodingStream(ZlibDecompression(;kwargs...), stream)
 end
 
 
@@ -84,6 +91,10 @@ end
     DeflateDecompression(;windowbits=$(Z_DEFAULT_WINDOWBITS))
 
 Create a deflate decompression codec.
+
+Arguments
+---------
+- `windowbits`: size of history buffer (8..15)
 """
 function DeflateDecompression(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(8 ≤ windowbits ≤ 15)
@@ -95,12 +106,12 @@ end
 const DeflateDecompressionStream{S} = TranscodingStream{DeflateDecompression,S}
 
 """
-    DeflateDecompressionStream(stream::IO)
+    DeflateDecompressionStream(stream::IO; kwargs...)
 
-Create a deflate decompression stream.
+Create a deflate decompression stream (see `DeflateDecompression` for `kwargs`).
 """
-function DeflateDecompressionStream(stream::IO)
-    return TranscodingStream(DeflateDecompression(), stream)
+function DeflateDecompressionStream(stream::IO; kwargs...)
+    return TranscodingStream(DeflateDecompression(;kwargs...), stream)
 end
 
 

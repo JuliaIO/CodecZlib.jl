@@ -17,6 +17,11 @@ end
     GzipCompression(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_WINDOWBITS))
 
 Create a gzip compression codec.
+
+Arguments
+---------
+- `level`: compression level (-1..9)
+- `windowbits`: size of history buffer (8..15)
 """
 function GzipCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
@@ -31,12 +36,12 @@ end
 const GzipCompressionStream{S} = TranscodingStream{GzipCompression,S}
 
 """
-    GzipCompressionStream(stream::IO)
+    GzipCompressionStream(stream::IO; kwargs...)
 
-Create a gzip compression stream.
+Create a gzip compression stream (see `GzipCompression` for `kwargs`).
 """
-function GzipCompressionStream(stream::IO)
-    return TranscodingStream(GzipCompression(), stream)
+function GzipCompressionStream(stream::IO; kwargs...)
+    return TranscodingStream(GzipCompression(;kwargs...), stream)
 end
 
 
@@ -53,6 +58,11 @@ end
     ZlibCompression(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_WINDOWBITS))
 
 Create a zlib compression codec.
+
+Arguments
+---------
+- `level`: compression level (-1..9)
+- `windowbits`: size of history buffer (8..15)
 """
 function ZlibCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
@@ -69,10 +79,10 @@ const ZlibCompressionStream{S} = TranscodingStream{ZlibCompression,S}
 """
     ZlibCompressionStream(stream::IO)
 
-Create a zlib compression stream.
+Create a zlib compression stream (see `ZlibCompression` for `kwargs`).
 """
-function ZlibCompressionStream(stream::IO)
-    return TranscodingStream(ZlibCompression(), stream)
+function ZlibCompressionStream(stream::IO; kwargs...)
+    return TranscodingStream(ZlibCompression(;kwargs...), stream)
 end
 
 
@@ -89,6 +99,11 @@ end
     DeflateCompression(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_COMPRESSION))
 
 Create a deflate compression codec.
+
+Arguments
+---------
+- `level`: compression level (-1..9)
+- `windowbits`: size of history buffer (8..15)
 """
 function DeflateCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
                         windowbits::Integer=Z_DEFAULT_WINDOWBITS)
@@ -103,12 +118,12 @@ end
 const DeflateCompressionStream{S} = TranscodingStream{DeflateCompression,S}
 
 """
-    DeflateCompressionStream(stream::IO)
+    DeflateCompressionStream(stream::IO; kwargs...)
 
-Create a deflate compression stream.
+Create a deflate compression stream (see `DeflateCompression` for `kwargs`).
 """
-function DeflateCompressionStream(stream::IO)
-    return TranscodingStream(DeflateCompression(), stream)
+function DeflateCompressionStream(stream::IO; kwargs...)
+    return TranscodingStream(DeflateCompression(;kwargs...), stream)
 end
 
 
