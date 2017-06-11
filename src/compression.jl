@@ -28,7 +28,7 @@ function GzipCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
     return GzipCompression(ZStream(), level, windowbits+16)
 end
 
-const GzipCompressionStream{S} = TranscodingStream{GzipCompression,S} where S<:IO
+const GzipCompressionStream{S} = TranscodingStream{GzipCompression,S}
 
 """
     GzipCompressionStream(stream::IO)
@@ -64,7 +64,7 @@ function ZlibCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
     return ZlibCompression(ZStream(), level, windowbits)
 end
 
-const ZlibCompressionStream{S} = TranscodingStream{ZlibCompression,S} where S<:IO
+const ZlibCompressionStream{S} = TranscodingStream{ZlibCompression,S}
 
 """
     ZlibCompressionStream(stream::IO)
@@ -100,7 +100,7 @@ function DeflateCompression(;level::Integer=Z_DEFAULT_COMPRESSION,
     return DeflateCompression(ZStream(), level, -Int(windowbits))
 end
 
-const DeflateCompressionStream{S} = TranscodingStream{DeflateCompression,S} where S<:IO
+const DeflateCompressionStream{S} = TranscodingStream{DeflateCompression,S}
 
 """
     DeflateCompressionStream(stream::IO)
