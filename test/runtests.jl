@@ -7,7 +7,7 @@ import TranscodingStreams:
     test_roundtrip_lines,
     test_roundtrip_transcode
 
-const testdir = dirname(@__FILE__)
+const testdir = @__DIR__
 
 @testset "Gzip Codec" begin
     # `gzip.compress(b"foo")` in Python 3.6.2 (zlib 1.2.8).
