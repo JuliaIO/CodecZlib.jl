@@ -100,9 +100,13 @@ function inflate!(zstream::ZStream, flush::Integer)
 end
 
 function zerror(zstream::ZStream, code::Integer)
+    return throw(ErrorException(zlib_error_message(zstream, code)))
+end
+
+function zlib_error_message(zstream::ZStream, code::Integer)
     if zstream.msg == C_NULL
-        error("zlib error: <no message> (code: $(code))")
+        return "zlib error: <no message> (code: $(code))"
     else
-        error("zlib error: $(unsafe_string(zstream.msg)) (code: $(code))")
+        return "zlib error: $(unsafe_string(zstream.msg)) (code: $(code))"
     end
 end

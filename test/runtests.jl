@@ -22,6 +22,19 @@ const testdir = @__DIR__
     @test !isopen(stream)
     @test !isopen(file)
 
+    # Corrupted data
+    gzip_data_corrupted = copy(gzip_data)
+    gzip_data_corrupted[1] = 0x00  # corrupt header
+    file = IOBuffer(gzip_data_corrupted)
+    stream = GzipDecompressionStream(file)
+    @test_throws ErrorException read(stream)
+    @test_throws ArgumentError read(stream)
+    @test !isopen(stream)
+    @test isopen(file)
+    @test close(stream) === nothing
+    @test !isopen(stream)
+    @test !isopen(file)
+
     stream = TranscodingStream(GzipDecompression(gziponly=false), IOBuffer(gzip_data))
     @test read(stream) == b"foo"
     close(stream)
