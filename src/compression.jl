@@ -135,16 +135,11 @@ function TranscodingStreams.initialize(codec::CompressionCodec)
     if code != Z_OK
         zerror(codec.zstream, code)
     end
-    finalizer(codec.zstream, free_deflate!)
     return
 end
 
 function TranscodingStreams.finalize(codec::CompressionCodec)
-    free_deflate!(codec.zstream)
-end
-
-# Free zstream if needed.
-function free_deflate!(zstream::ZStream)
+    zstream = codec.zstream
     if zstream.state != C_NULL
         code = deflate_end!(zstream)
         if code != Z_OK
@@ -154,15 +149,17 @@ function free_deflate!(zstream::ZStream)
     return
 end
 
-function TranscodingStreams.startproc(codec::CompressionCodec)
+function TranscodingStreams.startproc(codec::CompressionCodec, state::Symbol, error::Error)
     code = deflate_reset!(codec.zstream)
-    if code != Z_OK
-        zerror(codec.zstream, code)
+    if code == Z_OK
+        return :ok
+    else
+        error[] = ErrorException(zlib_error_message(codec.zstream, code))
+        return :error
     end
-    return :ok
 end
 
-function TranscodingStreams.process(codec::CompressionCodec, input::Memory, output::Memory)
+function TranscodingStreams.process(codec::CompressionCodec, input::Memory, output::Memory, error::Error)
     zstream = codec.zstream
     zstream.next_in = input.ptr
     zstream.avail_in = input.size
@@ -176,6 +173,7 @@ function TranscodingStreams.process(codec::CompressionCodec, input::Memory, outp
     elseif code == Z_STREAM_END
         return Δin, Δout, :end
     else
-        zerror(zstream, code)
+        error[] = ErrorException(zlib_error_message(zstream, code))
+        return Δin, Δout, :error
     end
 end
