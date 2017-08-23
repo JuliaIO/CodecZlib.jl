@@ -1,7 +1,7 @@
 # Libz Interfaces
 # ===============
 
-type ZStream
+mutable struct ZStream
     next_in::Ptr{UInt8}
     avail_in::Cuint
     total_in::Culong
