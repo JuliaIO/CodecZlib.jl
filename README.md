@@ -36,7 +36,7 @@ close(stream)
 # Array API.
 compressed = transcode(GzipCompression(), text)
 @assert sizeof(compressed) < sizeof(text)
-@assert String(transcode(GzipDecompression(), compressed)) == text
+@assert transcode(GzipDecompression(), compressed) == Vector{UInt8}(text)
 ```
 
 This package exports following codecs and streams:
