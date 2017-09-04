@@ -3,6 +3,10 @@
 
 abstract type DecompressionCodec <: TranscodingStreams.Codec end
 
+function Base.show(io::IO, codec::DecompressionCodec)
+    print(io, summary(codec), "(windowbits=$(codec.windowbits))")
+end
+
 
 # Gzip
 # ----

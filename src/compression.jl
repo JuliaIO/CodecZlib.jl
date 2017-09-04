@@ -3,6 +3,10 @@
 
 abstract type CompressionCodec <: TranscodingStreams.Codec end
 
+function Base.show(io::IO, codec::CompressionCodec)
+    print(io, summary(codec), "(level=$(codec.level), windowbits=$(codec.windowbits))")
+end
+
 
 # Gzip
 # ----
