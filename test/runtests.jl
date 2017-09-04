@@ -10,6 +10,18 @@ import TranscodingStreams:
 const testdir = @__DIR__
 
 @testset "Gzip Codec" begin
+    codec = GzipCompression()
+    @test codec isa GzipCompression
+    @test ismatch(r"^CodecZlib.GzipCompression\(level=-1, windowbits=\d+\)$", sprint(show, codec))
+    @test CodecZlib.initialize(codec) === nothing
+    @test CodecZlib.finalize(codec) === nothing
+
+    codec = GzipDecompression()
+    @test codec isa GzipDecompression
+    @test ismatch(r"^CodecZlib.GzipDecompression\(windowbits=\d+\)$", sprint(show, codec))
+    @test CodecZlib.initialize(codec) === nothing
+    @test CodecZlib.finalize(codec) === nothing
+
     # `gzip.compress(b"foo")` in Python 3.6.2 (zlib 1.2.8).
     gzip_data = b"\x1f\x8b\x08\x00R\xcc\x10Y\x02\xffK\xcb\xcf\x07\x00!es\x8c\x03\x00\x00\x00"
 
@@ -93,6 +105,18 @@ const testdir = @__DIR__
 end
 
 @testset "Zlib Codec" begin
+    codec = ZlibCompression()
+    @test codec isa ZlibCompression
+    @test ismatch(r"^CodecZlib\.ZlibCompression\(level=-1, windowbits=\d+\)$", sprint(show, codec))
+    @test CodecZlib.initialize(codec) === nothing
+    @test CodecZlib.finalize(codec) === nothing
+
+    codec = ZlibDecompression()
+    @test codec isa ZlibDecompression
+    @test ismatch(r"^CodecZlib\.ZlibDecompression\(windowbits=\d+\)$", sprint(show, codec))
+    @test CodecZlib.initialize(codec) === nothing
+    @test CodecZlib.finalize(codec) === nothing
+
     # `zlib.compress(b"foo")` in Python 3.6.2 (zlib 1.2.8).
     zlib_data = b"x\x9cK\xcb\xcf\x07\x00\x02\x82\x01E"
 
@@ -154,6 +178,19 @@ end
 end
 
 @testset "Deflate Codec" begin
+    codec = DeflateCompression()
+    @test codec isa DeflateCompression
+    @test ismatch(r"^CodecZlib\.DeflateCompression\(level=-1, windowbits=-\d+\)$", sprint(show, codec))
+    @test CodecZlib.initialize(codec) === nothing
+    # FIXME: This test fails.
+    #@test CodecZlib.finalize(codec) === nothing
+
+    codec = DeflateDecompression()
+    @test codec isa DeflateDecompression
+    @test ismatch(r"^CodecZlib\.DeflateDecompression\(windowbits=-\d+\)$", sprint(show, codec))
+    @test CodecZlib.initialize(codec) === nothing
+    @test CodecZlib.finalize(codec) === nothing
+
     test_roundtrip_read(DeflateCompressionStream, DeflateDecompressionStream)
     test_roundtrip_write(DeflateCompressionStream, DeflateDecompressionStream)
     test_roundtrip_lines(DeflateCompressionStream, DeflateDecompressionStream)

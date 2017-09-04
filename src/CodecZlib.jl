@@ -25,7 +25,9 @@ import TranscodingStreams:
     TranscodingStreams,
     TranscodingStream,
     Memory,
-    Error
+    Error,
+    initialize,
+    finalize
 
 include("libz.jl")
 include("compression.jl")
