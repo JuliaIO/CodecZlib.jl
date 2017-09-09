@@ -43,7 +43,8 @@ const GzipDecompressionStream{S} = TranscodingStream{GzipDecompression,S} where 
 Create a gzip decompression stream (see `GzipDecompression` for `kwargs`).
 """
 function GzipDecompressionStream(stream::IO; kwargs...)
-    return TranscodingStream(GzipDecompression(;kwargs...), stream)
+    x, y = splitkwargs(kwargs, (:windowbits, :gziponly))
+    return TranscodingStream(GzipDecompression(;x...), stream; y...)
 end
 
 
@@ -79,7 +80,8 @@ const ZlibDecompressionStream{S} = TranscodingStream{ZlibDecompression,S} where 
 Create a deflate decompression stream (see `ZlibDecompression` for `kwargs`).
 """
 function ZlibDecompressionStream(stream::IO; kwargs...)
-    return TranscodingStream(ZlibDecompression(;kwargs...), stream)
+    x, y = splitkwargs(kwargs, (:windowbits,))
+    return TranscodingStream(ZlibDecompression(;x...), stream; y...)
 end
 
 
@@ -115,7 +117,8 @@ const DeflateDecompressionStream{S} = TranscodingStream{DeflateDecompression,S} 
 Create a deflate decompression stream (see `DeflateDecompression` for `kwargs`).
 """
 function DeflateDecompressionStream(stream::IO; kwargs...)
-    return TranscodingStream(DeflateDecompression(;kwargs...), stream)
+    x, y = splitkwargs(kwargs, (:windowbits,))
+    return TranscodingStream(DeflateDecompression(;x...), stream; y...)
 end
 
 

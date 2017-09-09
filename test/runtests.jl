@@ -34,6 +34,13 @@ const testdir = @__DIR__
     @test !isopen(stream)
     @test !isopen(file)
 
+    file = IOBuffer(gzip_data)
+    stream = GzipDecompressionStream(file, bufsize=1)
+    @test length(stream.state.buffer1) == 1
+    @test length(stream.state.buffer2) == 1
+    @test read(stream) == b"foo"
+    close(stream)
+
     # Corrupted data
     gzip_data_corrupted = copy(gzip_data)
     gzip_data_corrupted[1] = 0x00  # corrupt header
@@ -128,6 +135,13 @@ end
     @test close(stream) === nothing
     @test !isopen(stream)
     @test !isopen(file)
+
+    file = IOBuffer(zlib_data)
+    stream = ZlibDecompressionStream(file, bufsize=1)
+    @test length(stream.state.buffer1) == 1
+    @test length(stream.state.buffer2) == 1
+    @test read(stream) == b"foo"
+    close(stream)
 
     stream = TranscodingStream(GzipDecompression(gziponly=false), IOBuffer(zlib_data))
     @test read(stream) == b"foo"
