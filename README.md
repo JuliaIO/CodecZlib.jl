@@ -13,6 +13,9 @@ Pkg.add("CodecZlib")
 
 ## Usage
 
+**Note**: `GzipCompression`, `GzipDecompressionStream`, etc. are deprecated. Use
+`GzipCompressor`, `GzipDecompressorStream`, etc. instead.
+
 ```julia
 using CodecZlib
 
@@ -27,28 +30,28 @@ erat ex bibendum ipsum, sed varius ipsum ipsum vitae dui.
 """
 
 # Streaming API.
-stream = GzipCompressionStream(IOBuffer(text))
-for line in eachline(GzipDecompressionStream(stream))
+stream = GzipCompressorStream(IOBuffer(text))
+for line in eachline(GzipDecompressorStream(stream))
     println(line)
 end
 close(stream)
 
 # Array API.
-compressed = transcode(GzipCompression(), text)
+compressed = transcode(GzipCompressor, text)
 @assert sizeof(compressed) < sizeof(text)
-@assert transcode(GzipDecompression(), compressed) == Vector{UInt8}(text)
+@assert transcode(GzipDecompressor, compressed) == Vector{UInt8}(text)
 ```
 
 This package exports following codecs and streams:
 
 | Codec                  | Stream                       |
 | ---------------------- | ---------------------------- |
-| `GzipCompression`      | `GzipCompressionStream`      |
-| `GzipDecompression`    | `GzipDecompressionStream`    |
-| `ZlibCompression`      | `ZlibCompressionStream`      |
-| `ZlibDecompression`    | `ZlibDecompressionStream`    |
-| `DeflateCompression`   | `DeflateCompressionStream`   |
-| `DeflateDecompression` | `DeflateDecompressionStream` |
+| `GzipCompressor`       | `GzipCompressorStream`       |
+| `GzipDecompressor`     | `GzipDecompressorStream`     |
+| `ZlibCompressor`       | `ZlibCompressorStream`       |
+| `ZlibDecompressor`     | `ZlibDecompressorStream`     |
+| `DeflateCompressor`    | `DeflateCompressorStream`    |
+| `DeflateDecompressor`  | `DeflateDecompressorStream`  |
 
 See docstrings and [TranscodingStreams.jl](https://github.com/bicycle1885/TranscodingStreams.jl) for details.
 
