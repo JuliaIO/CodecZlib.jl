@@ -6,6 +6,9 @@ os:
 julia:
   - 0.6
   - nightly
+matrix:
+  allow_failures:
+    - julia: nightly
 notifications:
   email: false
 # uncomment the following lines to override the default test script
@@ -14,4 +17,4 @@ notifications:
 #  - julia -e 'Pkg.clone(pwd()); Pkg.build("CodecZlib"); Pkg.test("CodecZlib"; coverage=true)'
 after_success:
   # push coverage results to Codecov
-  - julia -e 'cd(Pkg.dir("CodecZlib")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - if [ $TRAVIS_JULIA_VERSION != "nightly" ]; then julia -e 'cd(Pkg.dir("CodecZlib")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
