@@ -43,4 +43,20 @@ include("libz.jl")
 include("compression.jl")
 include("decompression.jl")
 
+# Deprecations
+# ------------
+
+@deprecate GzipCompression            GzipCompressor
+@deprecate GzipCompressionStream      GzipCompressorStream
+@deprecate GzipDecompression          GzipDecompressor
+@deprecate GzipDecompressionStream    GzipDecompressorStream
+@deprecate ZlibCompression            ZlibCompressor
+@deprecate ZlibCompressionStream      ZlibCompressorStream
+@deprecate ZlibDecompression          ZlibDecompressor
+@deprecate ZlibDecompressionStream    ZlibDecompressorStream
+@deprecate DeflateCompression         DeflateCompressor
+@deprecate DeflateCompressionStream   DeflateCompressorStream
+@deprecate DeflateDecompression       DeflateDecompressor
+@deprecate DeflateDecompressionStream DeflateDecompressorStream
+
 end # module
