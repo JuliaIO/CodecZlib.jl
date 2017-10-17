@@ -4,22 +4,22 @@ module CodecZlib
 
 export
     # gzip
-    GzipCompression,
-    GzipCompressionStream,
-    GzipDecompression,
-    GzipDecompressionStream,
+    GzipCompressor,
+    GzipCompressorStream,
+    GzipDecompressor,
+    GzipDecompressorStream,
 
     # zlib
-    ZlibCompression,
-    ZlibCompressionStream,
-    ZlibDecompression,
-    ZlibDecompressionStream,
+    ZlibCompressor,
+    ZlibCompressorStream,
+    ZlibDecompressor,
+    ZlibDecompressorStream,
 
     # deflate
-    DeflateCompression,
-    DeflateCompressionStream,
-    DeflateDecompression,
-    DeflateDecompressionStream
+    DeflateCompressor,
+    DeflateCompressorStream,
+    DeflateDecompressor,
+    DeflateDecompressorStream
 
 import TranscodingStreams:
     TranscodingStreams,
