@@ -13,6 +13,9 @@ Pkg.add("CodecZlib")
 
 ## Usage
 
+**Note**: `GzipCompression`, `GzipDecompressionStream`, etc. are deprecated. Use
+`GzipCompressor`, `GzipDecompressorStream`, etc. instead.
+
 ```julia
 using CodecZlib
 
@@ -34,21 +37,21 @@ end
 close(stream)
 
 # Array API.
-compressed = transcode(GzipCompressor(), text)
+compressed = transcode(GzipCompressor, text)
 @assert sizeof(compressed) < sizeof(text)
-@assert transcode(GzipDecompressor(), compressed) == Vector{UInt8}(text)
+@assert transcode(GzipDecompressor, compressed) == Vector{UInt8}(text)
 ```
 
 This package exports following codecs and streams:
 
 | Codec                  | Stream                       |
 | ---------------------- | ---------------------------- |
-| `GzipCompressor`      | `GzipCompressorStream`      |
-| `GzipDecompressor`    | `GzipDecompressorStream`    |
-| `ZlibCompressor`      | `ZlibCompressorStream`      |
-| `ZlibDecompressor`    | `ZlibDecompressorStream`    |
-| `DeflateCompressor`   | `DeflateCompressorStream`   |
-| `DeflateDecompressor` | `DeflateDecompressorStream` |
+| `GzipCompressor`       | `GzipCompressorStream`       |
+| `GzipDecompressor`     | `GzipDecompressorStream`     |
+| `ZlibCompressor`       | `ZlibCompressorStream`       |
+| `ZlibDecompressor`     | `ZlibDecompressorStream`     |
+| `DeflateCompressor`    | `DeflateCompressorStream`    |
+| `DeflateDecompressor`  | `DeflateDecompressorStream`  |
 
 See docstrings and [TranscodingStreams.jl](https://github.com/bicycle1885/TranscodingStreams.jl) for details.
 
