@@ -32,7 +32,7 @@ function GzipDecompressor(;windowbits::Integer=Z_DEFAULT_WINDOWBITS, gziponly::B
     if !(8 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 8..15"))
     end
-    return GzipDecompressor(ZStream(), windowbits+(gziponly?16:32))
+    return GzipDecompressor(ZStream(), windowbits+(gziponly ? 16 : 32))
 end
 
 const GzipDecompressorStream{S} = TranscodingStream{GzipDecompressor,S} where S<:IO
