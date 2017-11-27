@@ -55,7 +55,7 @@ const Z_DEFAULT_STRATEGY = Cint(0)
 const Z_DEFAULT_MEMLEVEL = Cint(8)
 const Z_DEFAULT_WINDOWBITS = Cint(15)
 
-if is_windows()
+if isdefined(Sys, :iswindows) ? Sys.iswindows() : is_windows()
     const libz = "zlib1"
 else
     const libz = "libz"
