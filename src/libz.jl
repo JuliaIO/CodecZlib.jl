@@ -11,11 +11,11 @@ mutable struct ZStream
     total_out::Culong
 
     msg::Ptr{UInt8}
-    state::Ptr{Void}
+    state::Ptr{Cvoid}
 
-    zalloc::Ptr{Void}
-    zfree::Ptr{Void}
-    opaque::Ptr{Void}
+    zalloc::Ptr{Cvoid}
+    zfree::Ptr{Cvoid}
+    opaque::Ptr{Cvoid}
 
     data_type::Cint
 
