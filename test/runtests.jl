@@ -1,4 +1,5 @@
 using CodecZlib
+using Compat
 if VERSION < v"0.7-"
     using Base.Test
 else
@@ -16,13 +17,13 @@ const testdir = @__DIR__
 @testset "Gzip Codec" begin
     codec = GzipCompressor()
     @test codec isa GzipCompressor
-    @test ismatch(r"^(CodecZlib\.)?GzipCompressor\(level=-1, windowbits=\d+\)$", sprint(show, codec))
+    @test contains(sprint(show, codec), r"^(CodecZlib\.)?GzipCompressor\(level=-1, windowbits=\d+\)$")
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
     codec = GzipDecompressor()
     @test codec isa GzipDecompressor
-    @test ismatch(r"^(CodecZlib\.)?GzipDecompressor\(windowbits=\d+\)$", sprint(show, codec))
+    @test contains(sprint(show, codec), r"^(CodecZlib\.)?GzipDecompressor\(windowbits=\d+\)$")
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
@@ -118,13 +119,13 @@ end
 @testset "Zlib Codec" begin
     codec = ZlibCompressor()
     @test codec isa ZlibCompressor
-    @test ismatch(r"^(CodecZlib\.)?ZlibCompressor\(level=-1, windowbits=\d+\)$", sprint(show, codec))
+    @test contains(sprint(show, codec), r"^(CodecZlib\.)?ZlibCompressor\(level=-1, windowbits=\d+\)$")
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
     codec = ZlibDecompressor()
     @test codec isa ZlibDecompressor
-    @test ismatch(r"^(CodecZlib\.)?ZlibDecompressor\(windowbits=\d+\)$", sprint(show, codec))
+    @test contains(sprint(show, codec), r"^(CodecZlib\.)?ZlibDecompressor\(windowbits=\d+\)$")
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
@@ -198,14 +199,14 @@ end
 @testset "Deflate Codec" begin
     codec = DeflateCompressor()
     @test codec isa DeflateCompressor
-    @test ismatch(r"^(CodecZlib\.)?DeflateCompressor\(level=-1, windowbits=-\d+\)$", sprint(show, codec))
+    @test contains(sprint(show, codec), r"^(CodecZlib\.)?DeflateCompressor\(level=-1, windowbits=-\d+\)$")
     @test CodecZlib.initialize(codec) === nothing
     # FIXME: This test fails.
     #@test CodecZlib.finalize(codec) === nothing
 
     codec = DeflateDecompressor()
     @test codec isa DeflateDecompressor
-    @test ismatch(r"^(CodecZlib\.)?DeflateDecompressor\(windowbits=-\d+\)$", sprint(show, codec))
+    @test contains(sprint(show, codec), r"^(CodecZlib\.)?DeflateDecompressor\(windowbits=-\d+\)$")
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
