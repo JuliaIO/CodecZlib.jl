@@ -55,12 +55,6 @@ const Z_DEFAULT_STRATEGY = Cint(0)
 const Z_DEFAULT_MEMLEVEL = Cint(8)
 const Z_DEFAULT_WINDOWBITS = Cint(15)
 
-if isdefined(Sys, :iswindows) ? Sys.iswindows() : is_windows()
-    const libz = "zlib1"
-else
-    const libz = "libz"
-end
-
 function version()
     return unsafe_string(ccall((:zlibVersion, libz), Ptr{UInt8}, ()))
 end

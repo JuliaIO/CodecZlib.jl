@@ -32,6 +32,16 @@ import TranscodingStreams:
 
 using Compat: Cvoid
 
+const libzpath = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
+if !isfile(libzpath)
+    error("CodecZlib.jl is not installed properly, run Pkg.build(\"CodecZlib\") and restart Julia.")
+end
+if VERSION > v"0.7-"
+    import Libdl
+end
+include(libzpath)
+check_deps()
+
 include("libz.jl")
 include("compression.jl")
 include("decompression.jl")
