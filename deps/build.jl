@@ -1,4 +1,6 @@
 using BinaryProvider
+using Compat
+using Compat.Libdl
 
 # Parse some basic command-line arguments
 const verbose = "--verbose" in ARGS
@@ -27,19 +29,70 @@ download_info = Dict(
     BinaryProvider.Windows(:x86_64) => ("$bin_prefix/Zlib.x86_64-w64-mingw32.tar.gz", "4479f1b7559227767e305520efe077f575b3edc7cb59235dbdca33e09a756ed1"),
 )
 
-# First, check to see if we're all satisfied
-if any(!satisfied(p; verbose=verbose) for p in products)
+# A simple source build fallback for platforms not supported by BinaryBuilder
+# Assumes that tar, GNU make, and a C compiler are available
+function sourcebuild()
+    srcdir = joinpath(@__DIR__, "src")
+    libdir = joinpath(@__DIR__, "lib")
+    z = "zlib-1.2.11"
+    for d = [srcdir, libdir]
+        isdir(d) && rm(d, force=true, recursive=true)
+        mkpath(d)
+    end
+    download("https://zlib.net/$(z).tar.gz", joinpath(srcdir, "$(z).tar.gz"))
+    cd(srcdir) do
+        run(`tar xzf $(z).tar.gz`)
+    end
+    cd(joinpath(srcdir, z)) do
+        run(`./configure --prefix=.`)
+        make = Compat.Sys.isbsd() ? `gmake` : `make`
+        run(`$make -j$(Sys.CPU_CORES)`)
+    end
+    found = false
+    for f in readdir(joinpath(srcdir, z))
+        if startswith(f, "libz." * Libdl.dlext)
+            found = true
+            Compat.cp(joinpath(srcdir, z, f), joinpath(libdir, f), force=true)
+        end
+    end
+    found || error("zlib was unable to build properly")
+    libz = joinpath(libdir, "libz." * Libdl.dlext)
+    open(joinpath(@__DIR__, "deps.jl"), "w") do io
+        println(io, """
+            using Compat
+            using Compat.Libdl
+            function check_deps()
+                ptr = Libdl.dlopen_e("$libz")
+                loaded = ptr != C_NULL
+                Libdl.dlclose(ptr)
+                if !loaded
+                    error("Unable to load zlib from $libz. Please rerun " *
+                          "`Pkg.build(\\"CodecZlib\\")` and restart Julia.")
+                end
+            end
+            const libz = "$libz"
+            """)
+    end
+end
+
+dobuild = try
+    key = platform_key() # This can error on older BinaryProvider versions (<=0.2.5)
+    isdefined(BinaryProvider, :UnknownPlatform) && key == UnknownPlatform()
+catch
+    true
+end
+
+if dobuild
+    sourcebuild()
+elseif any(!satisfied(p; verbose=verbose) for p in products)
+    # Check to see if we're all satisfied
     if haskey(download_info, platform_key())
         # Download and install binaries
         url, tarball_hash = download_info[platform_key()]
         install(url, tarball_hash; prefix=prefix, force=true, verbose=verbose)
-    else
-        # If we don't have a BinaryProvider-compatible .tar.gz to download, complain.
-        # Alternatively, you could attempt to install from a separate provider,
-        # build from source or something more even more ambitious here.
-        error("Your platform $(triplet(platform_key())) is not supported by this package!")
     end
 end
 
 # Write out a deps.jl file that will contain mappings for our products
-write_deps_file(joinpath(@__DIR__, "deps.jl"), products)
+# This is already done if we've built from source
+dobuild || write_deps_file(joinpath(@__DIR__, "deps.jl"), products)

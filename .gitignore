@@ -1,3 +1,6 @@
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
+deps/deps.jl
+deps/src
+deps/lib
