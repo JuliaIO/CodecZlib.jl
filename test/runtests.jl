@@ -250,14 +250,14 @@ end
     testfile = joinpath(dirname(@__FILE__), "abra.gzip")
 
     @testset "open" begin
-        open(CodecZlib.GzipDecompressorStream, testfile) do stream
+        open(GzipDecompressorStream, testfile) do stream
             @test read(stream) == b"abracadabra"
         end
     end
 
     @testset "stats" begin
         size = filesize(testfile)
-        stream = CodecZlib.GzipDecompressorStream(open(testfile))
+        stream = GzipDecompressorStream(open(testfile))
         stats = TranscodingStreams.stats(stream)
         @test stats.in == 0
         @test stats.out == 0
@@ -273,7 +273,7 @@ end
         @test_throws ArgumentError TranscodingStreams.stats(stream)
 
         buf = IOBuffer()
-        stream = CodecZlib.GzipCompressorStream(buf)
+        stream = GzipCompressorStream(buf)
         stats = TranscodingStreams.stats(stream)
         @test stats.in == 0
         @test stats.out == 0
