@@ -6,6 +6,7 @@ else
     using Test
 end
 import TranscodingStreams:
+    TranscodingStreams,
     TranscodingStream,
     test_roundtrip_read,
     test_roundtrip_write,
@@ -221,4 +222,77 @@ end
     @test_throws ArgumentError DeflateCompressor(level=10)
     @test_throws ArgumentError DeflateCompressor(windowbits=16)
     @test_throws ArgumentError DeflateDecompressor(windowbits=16)
+end
+
+# Test APIs of TranscodingStreams.jl using the gzip compressor/decompressor.
+@testset "TranscodingStreams" begin
+    TranscodingStreams.test_chunked_read(GzipCompressor, GzipDecompressor)
+    TranscodingStreams.test_chunked_write(GzipCompressor, GzipDecompressor)
+    TranscodingStreams.test_roundtrip_fileio(GzipCompressor, GzipDecompressor)
+
+    @testset "seek" begin
+        data = transcode(GzipCompressor, Vector(b"abracadabra"))
+        stream = TranscodingStream(GzipDecompressor(), IOBuffer(data))
+        seekstart(stream)
+        @test read(stream, 3) == b"abr"
+        seekstart(stream)
+        @test read(stream, 3) == b"abr"
+        seekend(stream)
+        #@test eof(stream)
+    end
+
+    @testset "panic" begin
+        stream = TranscodingStream(GzipDecompressor(), IOBuffer("some invalid data"))
+        @test_throws ErrorException read(stream)
+        @test_throws ArgumentError eof(stream)
+    end
+
+    testfile = joinpath(dirname(@__FILE__), "abra.gz")
+
+    @testset "open" begin
+        open(GzipDecompressorStream, testfile) do stream
+            @test read(stream) == b"abracadabra"
+        end
+    end
+
+    @testset "stats" begin
+        size = filesize(testfile)
+        stream = GzipDecompressorStream(open(testfile))
+        stats = TranscodingStreams.stats(stream)
+        @test stats.in == 0
+        @test stats.out == 0
+        @test stats.transcoded_in == 0
+        @test stats.transcoded_out == 0
+        read(stream, UInt8)
+        stats = TranscodingStreams.stats(stream)
+        @test stats.in == size
+        @test stats.out == 1
+        @test stats.transcoded_in == size
+        @test stats.transcoded_out == 11
+        close(stream)
+        @test_throws ArgumentError TranscodingStreams.stats(stream)
+
+        buf = IOBuffer()
+        stream = GzipCompressorStream(buf)
+        stats = TranscodingStreams.stats(stream)
+        @test stats.in == 0
+        @test stats.out == 0
+        @test stats.transcoded_in == 0
+        @test stats.transcoded_out == 0
+        write(stream, b"abracadabra")
+        stats = TranscodingStreams.stats(stream)
+        @test stats.in == 11
+        @test stats.out == 0
+        @test stats.transcoded_in == 0
+        @test stats.transcoded_out == 0
+        write(stream, TranscodingStreams.TOKEN_END)
+        flush(stream)
+        stats = TranscodingStreams.stats(stream)
+        @test stats.in == 11
+        @test stats.out == position(buf)
+        @test stats.transcoded_in == 11
+        @test stats.transcoded_out == position(buf)
+        close(stream)
+        @test_throws ArgumentError TranscodingStreams.stats(stream)
+    end
 end
