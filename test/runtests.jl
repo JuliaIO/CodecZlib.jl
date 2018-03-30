@@ -247,7 +247,7 @@ end
         @test_throws ArgumentError eof(stream)
     end
 
-    testfile = joinpath(dirname(@__FILE__), "abra.gzip")
+    testfile = joinpath(dirname(@__FILE__), "abra.gz")
 
     @testset "open" begin
         open(GzipDecompressorStream, testfile) do stream
