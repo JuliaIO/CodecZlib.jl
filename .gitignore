@@ -4,3 +4,4 @@
 deps/deps.jl
 deps/src
 deps/lib
+/Manifest.toml
