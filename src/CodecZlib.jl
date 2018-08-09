@@ -31,7 +31,11 @@ import TranscodingStreams:
     splitkwargs
 
 using Compat: Cvoid
-using Compat.Libdl
+if VERSION < v"0.7.0-DEV.3382"
+    using Base.Libdl
+else
+    using Libdl
+end
 
 const libzpath = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
 if !isfile(libzpath)
