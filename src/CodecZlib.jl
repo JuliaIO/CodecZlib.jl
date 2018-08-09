@@ -27,12 +27,7 @@ import TranscodingStreams:
     initialize,
     finalize,
     splitkwargs
-
-if VERSION < v"0.7.0-DEV.3382"
-    using Base.Libdl
-else
-    using Libdl
-end
+using Libdl
 
 const libzpath = joinpath(dirname(@__FILE__), "..", "deps", "deps.jl")
 if !isfile(libzpath)
