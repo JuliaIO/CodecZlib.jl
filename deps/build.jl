@@ -1,6 +1,4 @@
 using BinaryProvider # requires BinaryProvider 0.3.0 or later
-using Compat
-using Compat.Libdl
 
 # Parse some basic command-line arguments
 const verbose = "--verbose" in ARGS
@@ -45,22 +43,20 @@ function sourcebuild()
     end
     cd(joinpath(srcdir, z)) do
         run(`./configure --prefix=.`)
-        make = Compat.Sys.isbsd() ? `gmake` : `make`
+        make = Sys.isbsd() ? `gmake` : `make`
         run(`$make -j$(Sys.CPU_CORES)`)
     end
     found = false
     for f in readdir(joinpath(srcdir, z))
         if startswith(f, "libz." * Libdl.dlext)
             found = true
-            Compat.cp(joinpath(srcdir, z, f), joinpath(libdir, f), force=true)
+            cp(joinpath(srcdir, z, f), joinpath(libdir, f), force=true)
         end
     end
     found || error("zlib was unable to build properly")
     libz = joinpath(libdir, "libz." * Libdl.dlext)
     open(joinpath(@__DIR__, "deps.jl"), "w") do io
         println(io, """
-            using Compat
-            using Compat.Libdl
             function check_deps()
                 ptr = Libdl.dlopen_e("$libz")
                 loaded = ptr != C_NULL

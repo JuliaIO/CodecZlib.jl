@@ -1,5 +1,4 @@
 using CodecZlib
-using Compat
 if VERSION < v"0.7-"
     using Base.Test
 else

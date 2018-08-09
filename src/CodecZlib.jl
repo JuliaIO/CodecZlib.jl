@@ -28,7 +28,6 @@ import TranscodingStreams:
     finalize,
     splitkwargs
 
-using Compat: Cvoid
 if VERSION < v"0.7.0-DEV.3382"
     using Base.Libdl
 else
