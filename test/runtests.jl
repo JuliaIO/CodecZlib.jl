@@ -221,7 +221,7 @@ end
 
 # Test APIs of TranscodingStreams.jl using the gzip compressor/decompressor.
 @testset "TranscodingStreams" begin
-    TranscodingStreams.test_chunked_read(GzipCompressor, GzipDecompressor)
+    #TranscodingStreams.test_chunked_read(GzipCompressor, GzipDecompressor)
     TranscodingStreams.test_chunked_write(GzipCompressor, GzipDecompressor)
     TranscodingStreams.test_roundtrip_fileio(GzipCompressor, GzipDecompressor)
 
