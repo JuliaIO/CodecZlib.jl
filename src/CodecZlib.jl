@@ -2,6 +2,10 @@ VERSION < v"0.7.0-beta2.199" && __precompile__()
 
 module CodecZlib
 
+# To make Pkg aware that this dependency
+# will be injected by BinaryProvider. 
+using Libdl
+
 export
     # gzip
     GzipCompressor,
