@@ -13,9 +13,6 @@ Pkg.add("CodecZlib")
 
 ## Usage
 
-**Note**: `GzipCompression`, `GzipDecompressionStream`, etc. are deprecated. Use
-`GzipCompressor`, `GzipDecompressorStream`, etc. instead.
-
 ```julia
 using CodecZlib
 
