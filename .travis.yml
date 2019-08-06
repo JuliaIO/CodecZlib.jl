@@ -3,6 +3,7 @@ language: julia
 os:
   - linux
   - osx
+  - windows
 julia:
   - 1.0
   - 1.1
@@ -16,4 +17,4 @@ notifications:
   email: false
 after_success:
   - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
-  - julia -e 'using Pkg; Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'
+  #- julia -e 'using Pkg; Pkg.add("Documenter"); include(joinpath("docs", "make.jl"))'
