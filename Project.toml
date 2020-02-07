@@ -2,16 +2,18 @@ name = "CodecZlib"
 uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
 license = "MIT"
 authors = ["Kenta Sato <bicycle1885@gmail.com>"]
-version = "0.6.0"
+version = "0.7.0"
 
 [deps]
 BinaryProvider = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 TranscodingStreams = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
+Zlib_jll = "83775a58-1f1d-513f-b197-d71354ab007a"
 
 [compat]
 BinaryProvider = "0.5"
 TranscodingStreams = "0.9"
+Zlib_jll = "1.2.11"
 julia = "1"
 
 [extras]
