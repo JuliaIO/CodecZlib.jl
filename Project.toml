@@ -2,7 +2,7 @@ name = "CodecZlib"
 uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
 license = "MIT"
 authors = ["Kenta Sato <bicycle1885@gmail.com>"]
-version = "0.7.0"
+version = "0.7.1"
 
 [deps]
 TranscodingStreams = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
