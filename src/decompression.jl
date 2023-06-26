@@ -157,12 +157,15 @@ end
 function TranscodingStreams.process(codec::DecompressorCodec, input::Memory, output::Memory, error::Error)
     zstream = codec.zstream
     zstream.next_in = input.ptr
-    zstream.avail_in = input.size
+
+    avail_in = min(input.size, typemax(UInt32))
+    zstream.avail_in = avail_in
     zstream.next_out = output.ptr
-    zstream.avail_out = output.size
+    avail_out = min(output.size, typemax(UInt32))
+    zstream.avail_out = avail_out
     code = inflate!(zstream, Z_NO_FLUSH)
-    Δin = Int(input.size - zstream.avail_in)
-    Δout = Int(output.size - zstream.avail_out)
+    Δin = Int(avail_in - zstream.avail_in)
+    Δout = Int(avail_out - zstream.avail_out)
     if code == Z_OK
         return Δin, Δout, :ok
     elseif code == Z_STREAM_END
