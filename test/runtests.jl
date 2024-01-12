@@ -232,8 +232,6 @@ end
         @test read(stream, 3) == b"abr"
         seekstart(stream)
         @test read(stream, 3) == b"abr"
-        seekend(stream)
-        #@test eof(stream)
     end
 
     @testset "panic" begin
