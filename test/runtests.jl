@@ -1,4 +1,5 @@
 using CodecZlib
+using Random
 using Test
 import TranscodingStreams:
     TranscodingStreams,
