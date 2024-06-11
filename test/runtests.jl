@@ -106,6 +106,9 @@ const testdir = @__DIR__
     test_roundtrip_read(GzipCompressorStream, GzipDecompressorStream)
     test_roundtrip_write(GzipCompressorStream, GzipDecompressorStream)
     test_roundtrip_lines(GzipCompressorStream, GzipDecompressorStream)
+    if isdefined(TranscodingStreams, :test_roundtrip_seekstart)
+        TranscodingStreams.test_roundtrip_seekstart(GzipCompressorStream, GzipDecompressorStream)
+    end
     test_roundtrip_transcode(GzipCompressor, GzipDecompressor)
 
     @test_throws ArgumentError GzipCompressor(level=10)
@@ -186,6 +189,9 @@ end
     test_roundtrip_read(ZlibCompressorStream, ZlibDecompressorStream)
     test_roundtrip_write(ZlibCompressorStream, ZlibDecompressorStream)
     test_roundtrip_lines(ZlibCompressorStream, ZlibDecompressorStream)
+    if isdefined(TranscodingStreams, :test_roundtrip_seekstart)
+        TranscodingStreams.test_roundtrip_seekstart(ZlibCompressorStream, ZlibDecompressorStream)
+    end
     test_roundtrip_transcode(ZlibCompressor, ZlibDecompressor)
 
     @test_throws ArgumentError ZlibCompressor(level=10)
@@ -210,6 +216,9 @@ end
     test_roundtrip_read(DeflateCompressorStream, DeflateDecompressorStream)
     test_roundtrip_write(DeflateCompressorStream, DeflateDecompressorStream)
     test_roundtrip_lines(DeflateCompressorStream, DeflateDecompressorStream)
+    if isdefined(TranscodingStreams, :test_roundtrip_seekstart)
+        TranscodingStreams.test_roundtrip_seekstart(DeflateCompressorStream, DeflateDecompressorStream)
+    end
     test_roundtrip_transcode(DeflateCompressor, DeflateDecompressor)
 
     @test DeflateCompressorStream <: TranscodingStream
