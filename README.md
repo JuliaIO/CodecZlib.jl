@@ -1,7 +1,8 @@
 CodecZlib.jl
 ============
 
-[![codecov.io][codecov-img]][codecov-url]
+[![CI](https://github.com/JuliaIO/CodecZlib.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaIO/CodecZlib.jl/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/gh/JuliaIO/CodecZlib.jl/graph/badge.svg?token=6V3Z847Ywr)](https://codecov.io/gh/JuliaIO/CodecZlib.jl)
 
 ## Installation
 
@@ -48,11 +49,4 @@ This package exports following codecs and streams:
 | `DeflateCompressor`    | `DeflateCompressorStream`    |
 | `DeflateDecompressor`  | `DeflateDecompressorStream`  |
 
-See docstrings and [TranscodingStreams.jl](https://github.com/bicycle1885/TranscodingStreams.jl) for details.
-
-[travisci-img]: https://travis-ci.org/JuliaIO/CodecZlib.jl.svg?branch=master
-[travisci-url]: https://travis-ci.org/JuliaIO/CodecZlib.jl
-[appveyor-img]: https://ci.appveyor.com/api/projects/status/xy5bx1fdvuxgemph?svg=true
-[appveyor-url]: https://ci.appveyor.com/project/bicycle1885/codeczlib-jl
-[codecov-img]: http://codecov.io/github/JuliaIO/CodecZlib.jl/coverage.svg?branch=master
-[codecov-url]: http://codecov.io/github/JuliaIO/CodecZlib.jl?branch=master
+See docstrings and [TranscodingStreams.jl](https://github.com/JuliaIO/TranscodingStreams.jl) for details.
