@@ -109,7 +109,7 @@ Create a deflate compression codec.
 Arguments
 ---------
 - `level`: compression level (-1..9)
-- `windowbits`: size of history buffer (8..15)
+- `windowbits`: size of history buffer (9..15)
 """
 function DeflateCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
                         windowbits::Integer=Z_DEFAULT_WINDOWBITS)
