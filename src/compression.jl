@@ -26,6 +26,9 @@ Arguments
 ---------
 - `level`: compression level (-1..9)
 - `windowbits`: size of history buffer (9..15)
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
 """
 function GzipCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
@@ -43,6 +46,9 @@ const GzipCompressorStream{S} = TranscodingStream{GzipCompressor,S} where S<:IO
     GzipCompressorStream(stream::IO; kwargs...)
 
 Create a gzip compression stream (see `GzipCompressor` for `kwargs`).
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this stream due to stored raw pointers.
 """
 function GzipCompressorStream(stream::IO; kwargs...)
     x, y = splitkwargs(kwargs, (:level, :windowbits))
@@ -68,6 +74,9 @@ Arguments
 ---------
 - `level`: compression level (-1..9)
 - `windowbits`: size of history buffer (9..15)
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
 """
 function ZlibCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
@@ -85,6 +94,9 @@ const ZlibCompressorStream{S} = TranscodingStream{ZlibCompressor,S} where S<:IO
     ZlibCompressorStream(stream::IO)
 
 Create a zlib compression stream (see `ZlibCompressor` for `kwargs`).
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this stream due to stored raw pointers.
 """
 function ZlibCompressorStream(stream::IO; kwargs...)
     x, y = splitkwargs(kwargs, (:level, :windowbits))
@@ -110,6 +122,9 @@ Arguments
 ---------
 - `level`: compression level (-1..9)
 - `windowbits`: size of history buffer (9..15)
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
 """
 function DeflateCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
                         windowbits::Integer=Z_DEFAULT_WINDOWBITS)
@@ -127,6 +142,9 @@ const DeflateCompressorStream{S} = TranscodingStream{DeflateCompressor,S} where 
     DeflateCompressorStream(stream::IO; kwargs...)
 
 Create a deflate compression stream (see `DeflateCompressor` for `kwargs`).
+
+!!! warning
+    `serialize` and `deepcopy` will not work with this stream due to stored raw pointers.
 """
 function DeflateCompressorStream(stream::IO; kwargs...)
     x, y = splitkwargs(kwargs, (:level, :windowbits))
