@@ -1,12 +1,17 @@
 using CodecZlib
 using Test
-import TranscodingStreams:
+using TranscodingStreams:
     TranscodingStreams,
-    TranscodingStream,
+    TranscodingStream
+using TestsForCodecPackages:
     test_roundtrip_read,
     test_roundtrip_write,
+    test_roundtrip_transcode,
     test_roundtrip_lines,
-    test_roundtrip_transcode
+    test_roundtrip_seekstart,
+    test_roundtrip_fileio,
+    test_chunked_read,
+    test_chunked_write
 
 const testdir = @__DIR__
 
@@ -105,6 +110,7 @@ const testdir = @__DIR__
     test_roundtrip_read(GzipCompressorStream, GzipDecompressorStream)
     test_roundtrip_write(GzipCompressorStream, GzipDecompressorStream)
     test_roundtrip_lines(GzipCompressorStream, GzipDecompressorStream)
+    test_roundtrip_seekstart(GzipCompressorStream, GzipDecompressorStream)
     test_roundtrip_transcode(GzipCompressor, GzipDecompressor)
 
     @test_throws ArgumentError GzipCompressor(level=10)
@@ -185,6 +191,7 @@ end
     test_roundtrip_read(ZlibCompressorStream, ZlibDecompressorStream)
     test_roundtrip_write(ZlibCompressorStream, ZlibDecompressorStream)
     test_roundtrip_lines(ZlibCompressorStream, ZlibDecompressorStream)
+    test_roundtrip_seekstart(ZlibCompressorStream, ZlibDecompressorStream)
     test_roundtrip_transcode(ZlibCompressor, ZlibDecompressor)
 
     @test_throws ArgumentError ZlibCompressor(level=10)
@@ -209,6 +216,7 @@ end
     test_roundtrip_read(DeflateCompressorStream, DeflateDecompressorStream)
     test_roundtrip_write(DeflateCompressorStream, DeflateDecompressorStream)
     test_roundtrip_lines(DeflateCompressorStream, DeflateDecompressorStream)
+    test_roundtrip_seekstart(DeflateCompressorStream, DeflateDecompressorStream)
     test_roundtrip_transcode(DeflateCompressor, DeflateDecompressor)
 
     @test DeflateCompressorStream <: TranscodingStream
@@ -221,9 +229,9 @@ end
 
 # Test APIs of TranscodingStreams.jl using the gzip compressor/decompressor.
 @testset "TranscodingStreams" begin
-    TranscodingStreams.test_chunked_read(GzipCompressor, GzipDecompressor)
-    TranscodingStreams.test_chunked_write(GzipCompressor, GzipDecompressor)
-    TranscodingStreams.test_roundtrip_fileio(GzipCompressor, GzipDecompressor)
+    test_chunked_read(GzipCompressor, GzipDecompressor)
+    test_chunked_write(GzipCompressor, GzipDecompressor)
+    test_roundtrip_fileio(GzipCompressor, GzipDecompressor)
 
     @testset "seek" begin
         data = transcode(GzipCompressor, Vector(b"abracadabra"))
@@ -232,8 +240,6 @@ end
         @test read(stream, 3) == b"abr"
         seekstart(stream)
         @test read(stream, 3) == b"abr"
-        seekend(stream)
-        #@test eof(stream)
     end
 
     @testset "panic" begin
