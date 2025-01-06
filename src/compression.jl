@@ -73,8 +73,8 @@ function ZlibCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(-1 ≤ level ≤ 9)
         throw(ArgumentError("compression level must be within -1..9"))
-    elseif !(9 ≤ abs(windowbits) ≤ 15)
-        throw(ArgumentError("|windowbits| must be within 9..15"))
+    elseif !(9 ≤ windowbits ≤ 15)
+        throw(ArgumentError("windowbits must be within 9..15"))
     end
     return ZlibCompressor(ZStream(), level, windowbits)
 end
