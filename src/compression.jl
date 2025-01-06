@@ -25,14 +25,14 @@ Create a gzip compression codec.
 Arguments
 ---------
 - `level`: compression level (-1..9)
-- `windowbits`: size of history buffer (8..15)
+- `windowbits`: size of history buffer (9..15)
 """
 function GzipCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(-1 ≤ level ≤ 9)
         throw(ArgumentError("compression level must be within -1..9"))
-    elseif !(8 ≤ windowbits ≤ 15)
-        throw(ArgumentError("windowbits must be within 8..15"))
+    elseif !(9 ≤ windowbits ≤ 15)
+        throw(ArgumentError("windowbits must be within 9..15"))
     end
     return GzipCompressor(ZStream(), level, windowbits+16)
 end
@@ -67,14 +67,14 @@ Create a zlib compression codec.
 Arguments
 ---------
 - `level`: compression level (-1..9)
-- `windowbits`: size of history buffer (8..15)
+- `windowbits`: size of history buffer (9..15)
 """
 function ZlibCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(-1 ≤ level ≤ 9)
         throw(ArgumentError("compression level must be within -1..9"))
-    elseif !(8 ≤ windowbits ≤ 15)
-        throw(ArgumentError("windowbits must be within 8..15"))
+    elseif !(9 ≤ windowbits ≤ 15)
+        throw(ArgumentError("windowbits must be within 9..15"))
     end
     return ZlibCompressor(ZStream(), level, windowbits)
 end
@@ -109,14 +109,14 @@ Create a deflate compression codec.
 Arguments
 ---------
 - `level`: compression level (-1..9)
-- `windowbits`: size of history buffer (8..15)
+- `windowbits`: size of history buffer (9..15)
 """
 function DeflateCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
                         windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(-1 ≤ level ≤ 9)
         throw(ArgumentError("compression level must be within -1..9"))
-    elseif !(8 ≤ windowbits ≤ 15)
-        throw(ArgumentError("windowbits must be within 8..15"))
+    elseif !(9 ≤ windowbits ≤ 15)
+        throw(ArgumentError("windowbits must be within 9..15"))
     end
     return DeflateCompressor(ZStream(), level, -Int(windowbits))
 end
