@@ -67,7 +67,7 @@ Create a zlib compression codec.
 Arguments
 ---------
 - `level`: compression level (-1..9)
-- `windowbits`: size of history buffer (9..15) or (-15..-9)
+- `windowbits`: size of history buffer (9..15)
 """
 function ZlibCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
                          windowbits::Integer=Z_DEFAULT_WINDOWBITS)
