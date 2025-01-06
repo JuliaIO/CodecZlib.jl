@@ -63,7 +63,7 @@ Create a zlib decompression codec.
 
 Arguments
 ---------
-- `windowbits`: size of history buffer (8..15) or (-15..-8) or 0
+- `windowbits`: size of history buffer (8..15)
 """
 function ZlibDecompressor(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(8 ≤ abs(windowbits) ≤ 15) || windowbits == 0
