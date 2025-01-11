@@ -27,7 +27,7 @@ import TranscodingStreams:
     initialize,
     finalize,
     splitkwargs
-using Zlib_jll
+using Zlib_jll: libz
 
 include("libz.jl")
 include("compression.jl")
