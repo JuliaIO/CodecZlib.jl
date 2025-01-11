@@ -1,5 +1,6 @@
 using CodecZlib
 using Test
+using Aqua: Aqua
 using TranscodingStreams:
     TranscodingStreams,
     TranscodingStream
@@ -11,7 +12,10 @@ using TestsForCodecPackages:
     test_roundtrip_seekstart,
     test_roundtrip_fileio,
     test_chunked_read,
-    test_chunked_write
+    test_chunked_write,
+    test_reuse_encoder
+
+Aqua.test_all(CodecZlib)
 
 const testdir = @__DIR__
 
@@ -112,6 +116,7 @@ const testdir = @__DIR__
     test_roundtrip_lines(GzipCompressorStream, GzipDecompressorStream)
     test_roundtrip_seekstart(GzipCompressorStream, GzipDecompressorStream)
     test_roundtrip_transcode(GzipCompressor, GzipDecompressor)
+    test_reuse_encoder(GzipCompressor, GzipDecompressor)
 
     @test_throws ArgumentError GzipCompressor(level=10)
     @test_throws ArgumentError GzipCompressor(windowbits=16)
@@ -193,6 +198,7 @@ end
     test_roundtrip_lines(ZlibCompressorStream, ZlibDecompressorStream)
     test_roundtrip_seekstart(ZlibCompressorStream, ZlibDecompressorStream)
     test_roundtrip_transcode(ZlibCompressor, ZlibDecompressor)
+    test_reuse_encoder(ZlibCompressor, ZlibDecompressor)
 
     @test_throws ArgumentError ZlibCompressor(level=10)
     @test_throws ArgumentError ZlibCompressor(windowbits=16)
@@ -218,6 +224,7 @@ end
     test_roundtrip_lines(DeflateCompressorStream, DeflateDecompressorStream)
     test_roundtrip_seekstart(DeflateCompressorStream, DeflateDecompressorStream)
     test_roundtrip_transcode(DeflateCompressor, DeflateDecompressor)
+    test_reuse_encoder(DeflateCompressor, DeflateDecompressor)
 
     @test DeflateCompressorStream <: TranscodingStream
     @test DeflateDecompressorStream <: TranscodingStream
