@@ -155,14 +155,6 @@ end
 # Methods
 # -------
 
-function TranscodingStreams.initialize(codec::CompressorCodec)
-    code = deflate_init!(codec.zstream, codec.level, codec.windowbits)
-    if code != Z_OK
-        zerror(codec.zstream, code)
-    end
-    return
-end
-
 function TranscodingStreams.finalize(codec::CompressorCodec)
     zstream = codec.zstream
     if zstream.state != C_NULL
@@ -174,18 +166,39 @@ function TranscodingStreams.finalize(codec::CompressorCodec)
     return
 end
 
-function TranscodingStreams.startproc(codec::CompressorCodec, state::Symbol, error::Error)
-    code = deflate_reset!(codec.zstream)
-    if code == Z_OK
-        return :ok
+function TranscodingStreams.startproc(codec::CompressorCodec, state::Symbol, error_ref::Error)
+    if codec.zstream.state == C_NULL
+        code = deflate_init!(codec.zstream, codec.level, codec.windowbits)
+        # errors in deflate_init! do not require clean up, so just throw
+        if code == Z_OK
+            return :ok
+        elseif code == Z_MEM_ERROR
+            throw(OutOfMemoryError())
+        elseif code == Z_STREAM_ERROR
+            error("Z_STREAM_ERROR: invalid parameter, this should be caught in the codec constructor")
+        elseif code == Z_VERSION_ERROR
+            error("Z_VERSION_ERROR: zlib library version is incompatible")
+        else
+            error("unexpected libz error code: $(code)")
+        end
     else
-        error[] = ErrorException(zlib_error_message(codec.zstream, code))
-        return :error
+        code = deflate_reset!(codec.zstream)
+        # errors in deflate_reset! do not require clean up, so just throw
+        if code == Z_OK
+            return :ok
+        elseif code == Z_STREAM_ERROR
+            error("Z_STREAM_ERROR: the source stream state was inconsistent")
+        else
+            error("unexpected libz error code: $(code)")
+        end
     end
 end
 
-function TranscodingStreams.process(codec::CompressorCodec, input::Memory, output::Memory, error::Error)
+function TranscodingStreams.process(codec::CompressorCodec, input::Memory, output::Memory, error_ref::Error)
     zstream = codec.zstream
+    if zstream.state == C_NULL
+        error("startproc must be called before process")
+    end
     zstream.next_in = input.ptr
     avail_in = min(input.size, typemax(UInt32))
     zstream.avail_in = avail_in
@@ -193,6 +206,7 @@ function TranscodingStreams.process(codec::CompressorCodec, input::Memory, outpu
     avail_out = min(output.size, typemax(UInt32))
     zstream.avail_out = avail_out
     code = deflate!(zstream, zstream.avail_in > 0 ? Z_NO_FLUSH : Z_FINISH)
+    @assert code != Z_STREAM_ERROR # state not clobbered
     Δin = Int(avail_in - zstream.avail_in)
     Δout = Int(avail_out - zstream.avail_out)
     if code == Z_OK
@@ -200,7 +214,7 @@ function TranscodingStreams.process(codec::CompressorCodec, input::Memory, outpu
     elseif code == Z_STREAM_END
         return Δin, Δout, :end
     else
-        error[] = ErrorException(zlib_error_message(zstream, code))
+        error_ref[] = ErrorException(zlib_error_message(zstream, code))
         return Δin, Δout, :error
     end
 end
