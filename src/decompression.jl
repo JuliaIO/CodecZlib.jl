@@ -174,7 +174,7 @@ function TranscodingStreams.startproc(codec::DecompressorCodec, ::Symbol, error_
         end
     else
         code = inflate_reset!(codec.zstream)
-        # errors in deflate_reset! do not require clean up, so just throw
+        # errors in inflate_reset! do not require clean up, so just throw
         if code == Z_OK
             return :ok
         elseif code == Z_STREAM_ERROR
