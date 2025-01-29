@@ -39,9 +39,17 @@ end
 
 const Z_DEFAULT_COMPRESSION = Cint(-1)
 
-const Z_OK         = Cint(0)
-const Z_STREAM_END = Cint(1)
-const Z_BUF_ERROR  = Cint(-5)
+const Z_OK            = Cint(0)
+const Z_STREAM_END    = Cint(1)
+const Z_NEED_DICT     = Cint(2)
+const Z_ERRNO         = Cint(-1)
+const Z_STREAM_ERROR  = Cint(-2)
+const Z_DATA_ERROR    = Cint(-3)
+const Z_MEM_ERROR     = Cint(-4)
+const Z_BUF_ERROR     = Cint(-5)
+const Z_VERSION_ERROR = Cint(-6)
+# Return codes for the compression/decompression functions. Negative values
+# are errors, positive values are used for special but normal events.
 
 const Z_NO_FLUSH      = Cint(0)
 const Z_SYNC_FLUSH    = Cint(2)
@@ -59,7 +67,9 @@ function version()
     return unsafe_string(ccall((:zlibVersion, libz), Ptr{UInt8}, ()))
 end
 
-const zlib_version = version()
+# This is the version of zlib used to make this wrapper.
+# The `_init!` functions will return an error if the library is not compatible.
+const zlib_version = "1.3.1"
 
 function deflate_init!(zstream::ZStream, level::Integer, windowbits::Integer)
     return ccall((:deflateInit2_, libz), Cint, (Ref{ZStream}, Cint, Cint, Cint, Cint, Cint, Cstring, Cint), zstream, level, Z_DEFLATED, windowbits, #=default memlevel=#8, #=default strategy=#0, zlib_version, sizeof(ZStream))
@@ -93,14 +103,28 @@ function inflate!(zstream::ZStream, flush::Integer)
     return ccall((:inflate, libz), Cint, (Ref{ZStream}, Cint), zstream, flush)
 end
 
+# Error
+# -----
+
+struct ZlibError <: Exception
+    msg::String
+end
+
+function Base.showerror(io::IO, err::ZlibError)
+    print(io, "ZlibError: ")
+    print(io, err.msg)
+    nothing
+end
+
+
 function zerror(zstream::ZStream, code::Integer)
-    return throw(ErrorException(zlib_error_message(zstream, code)))
+    throw(ZlibError(zlib_error_message(zstream, code)))
 end
 
 function zlib_error_message(zstream::ZStream, code::Integer)
     if zstream.msg == C_NULL
-        return "zlib error: <no message> (code: $(code))"
+        return "<no message> (code: $(code))"
     else
-        return "zlib error: $(unsafe_string(zstream.msg)) (code: $(code))"
+        return "$(unsafe_string(zstream.msg)) (code: $(code))"
     end
 end

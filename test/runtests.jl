@@ -1,4 +1,5 @@
 using CodecZlib
+using CodecZlib: ZlibError
 using Test
 using Aqua: Aqua
 using TranscodingStreams:
@@ -56,7 +57,7 @@ const testdir = @__DIR__
     gzip_data_corrupted[1] = 0x00  # corrupt header
     file = IOBuffer(gzip_data_corrupted)
     stream = GzipDecompressorStream(file)
-    @test_throws ErrorException read(stream)
+    @test_throws ZlibError read(stream)
     @test_throws ArgumentError read(stream)
     @test !isopen(stream)
     @test isopen(file)
@@ -160,7 +161,7 @@ end
     close(stream)
 
     stream = TranscodingStream(GzipDecompressor(gziponly=true), IOBuffer(zlib_data))
-    @test_throws Exception read(stream)
+    @test_throws ZlibError read(stream)
     close(stream)
 
     file = IOBuffer(b"foo")
@@ -251,7 +252,7 @@ end
 
     @testset "panic" begin
         stream = TranscodingStream(GzipDecompressor(), IOBuffer("some invalid data"))
-        @test_throws ErrorException read(stream)
+        @test_throws ZlibError read(stream)
         @test_throws ArgumentError eof(stream)
     end
 
@@ -303,4 +304,33 @@ end
         close(stream)
         @test_throws ArgumentError TranscodingStreams.stats(stream)
     end
+end
+
+@testset "unexpected end of stream errors" begin
+    tests = [
+        (ZlibCompressor, ZlibDecompressor),
+        (DeflateCompressor, DeflateDecompressor),
+        (GzipCompressor, GzipDecompressor),
+    ]
+    @testset "$(encoder)" for (encoder, decoder) in tests
+        local uncompressed = rand(UInt8, 1000)
+        local compressed = transcode(encoder, uncompressed)
+        for i in 0:length(compressed)-1
+            @test_throws ZlibError("the compressed stream may be truncated") transcode(decoder, compressed[1:i])
+        end
+        @test transcode(decoder, compressed) == uncompressed
+        # compressing empty vector should still work
+        @test transcode(decoder, transcode(encoder, UInt8[])) == UInt8[]
+    end
+end
+@testset "data errors" begin
+    @test_throws ZlibError transcode(ZlibDecompressor, zeros(UInt8, 10))
+    local uncompressed = rand(UInt8, 1000)
+    local compressed = transcode(ZlibCompressor, uncompressed)
+    compressed[70] ⊻= 0x01
+    @test_throws ZlibError transcode(ZlibDecompressor, compressed)
+end
+@testset "error printing" begin
+    @test sprint(Base.showerror, ZlibError("test error message")) ==
+        "ZlibError: test error message"
 end
