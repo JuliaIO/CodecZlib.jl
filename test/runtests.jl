@@ -20,6 +20,19 @@ Aqua.test_all(CodecZlib)
 
 const testdir = @__DIR__
 
+# decompress one byte at a time
+function decompress_bytes(decoder, data::Vector{UInt8})::Vector{UInt8}
+    io = IOBuffer()
+    s = decoder(io; bufsize=1)
+    for i in eachindex(data)
+        write(s, data[i])
+        flush(s)
+    end
+    write(s, TranscodingStreams.TOKEN_END)
+    flush(s)
+    take!(io)
+end
+
 @testset "Gzip Codec" begin
     codec = GzipCompressor()
     @test codec isa GzipCompressor
@@ -211,8 +224,7 @@ end
     @test codec isa DeflateCompressor
     @test occursin(r"^(CodecZlib\.)?DeflateCompressor\(level=-1, windowbits=-\d+\)$", sprint(show, codec))
     @test CodecZlib.initialize(codec) === nothing
-    # FIXME: This test fails.
-    #@test CodecZlib.finalize(codec) === nothing
+    @test CodecZlib.finalize(codec) === nothing
 
     codec = DeflateDecompressor()
     @test codec isa DeflateDecompressor
@@ -233,6 +245,20 @@ end
     @test_throws ArgumentError DeflateCompressor(level=10)
     @test_throws ArgumentError DeflateCompressor(windowbits=16)
     @test_throws ArgumentError DeflateDecompressor(windowbits=16)
+
+    # Test decoding byte by byte
+    # Exercise Deflate distances and lengths
+    for len in [10, 100, 200, 257, 258, 259]
+        thing = rand(UInt8, len)
+        d = UInt8[]
+        for dist in [0:258; 1000:1030; 2000:1000:33000;]
+            append!(d, thing)
+            append!(d, rand(0x00:0x0f, dist))
+        end
+        c = transcode(DeflateCompressor, d)
+        @test transcode(DeflateDecompressor, c) == d
+        @test decompress_bytes(DeflateDecompressorStream, c) == d
+    end
 end
 
 # Test APIs of TranscodingStreams.jl using the gzip compressor/decompressor.
@@ -329,6 +355,17 @@ end
     local compressed = transcode(ZlibCompressor, uncompressed)
     compressed[70] ⊻= 0x01
     @test_throws ZlibError transcode(ZlibDecompressor, compressed)
+    # Z_NEED_DICT error
+    try
+        transcode(
+            ZlibDecompressor,
+            UInt8[0x78, 0xbb, 0x00, 0x00, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01],
+        )
+        @test false
+    catch e
+        @test e isa ZlibError
+        @test endswith(e.msg, "(code: $(CodecZlib.Z_NEED_DICT))")
+    end
 end
 @testset "error printing" begin
     @test sprint(Base.showerror, ZlibError("test error message")) ==
