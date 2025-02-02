@@ -33,6 +33,17 @@ function decompress_bytes(decoder, data::Vector{UInt8})::Vector{UInt8}
     take!(io)
 end
 
+# generate random data to test compression
+function generate_data()
+    thing = rand(UInt8, 100)
+    d = UInt8[]
+    for dist in [0:258; 400:200:2000; 2000:1000:33000;]
+        append!(d, thing)
+        append!(d, rand(0x00:0x0f, dist))
+    end
+    d
+end
+
 @testset "Gzip Codec" begin
     codec = GzipCompressor()
     @test codec isa GzipCompressor
@@ -133,8 +144,6 @@ end
     test_reuse_encoder(GzipCompressor, GzipDecompressor)
 
     @test_throws ArgumentError GzipCompressor(level=10)
-    @test_throws ArgumentError GzipCompressor(windowbits=16)
-    @test_throws ArgumentError GzipDecompressor(windowbits=16)
 end
 
 @testset "Zlib Codec" begin
@@ -215,8 +224,6 @@ end
     test_reuse_encoder(ZlibCompressor, ZlibDecompressor)
 
     @test_throws ArgumentError ZlibCompressor(level=10)
-    @test_throws ArgumentError ZlibCompressor(windowbits=16)
-    @test_throws ArgumentError ZlibDecompressor(windowbits=16)
 end
 
 @testset "Deflate Codec" begin
@@ -243,21 +250,40 @@ end
     @test DeflateDecompressorStream <: TranscodingStream
 
     @test_throws ArgumentError DeflateCompressor(level=10)
-    @test_throws ArgumentError DeflateCompressor(windowbits=16)
-    @test_throws ArgumentError DeflateDecompressor(windowbits=16)
 
     # Test decoding byte by byte
-    # Exercise Deflate distances and lengths
-    for len in [10, 100, 200, 257, 258, 259]
-        thing = rand(UInt8, len)
-        d = UInt8[]
-        for dist in [0:258; 1000:1030; 2000:1000:33000;]
-            append!(d, thing)
-            append!(d, rand(0x00:0x0f, dist))
+    d = generate_data()
+    c = transcode(DeflateCompressor, d)
+    @test transcode(DeflateDecompressor, c) == d
+    @test decompress_bytes(DeflateDecompressorStream, c) == d
+end
+
+@testset "roundtrip windowbits" begin
+    d = generate_data()
+    for (encoder, decoder) in [
+            (GzipCompressorStream, GzipDecompressorStream),
+            (ZlibCompressorStream, ZlibDecompressorStream),
+            (DeflateCompressorStream, DeflateDecompressorStream),
+        ]
+        for compression_windowbits in 9:15
+            for decompression_windowbits in 8:15
+                c = read(encoder(IOBuffer(d); windowbits=compression_windowbits, level=9))
+                if compression_windowbits ≤ decompression_windowbits
+                    @test d == read(decoder(IOBuffer(c); windowbits=decompression_windowbits))
+                else
+                    try
+                        u = read(decoder(IOBuffer(c); windowbits=decompression_windowbits))
+                        @test u == d
+                    catch e
+                        @test e isa ZlibError
+                    end
+                end
+            end
         end
-        c = transcode(DeflateCompressor, d)
-        @test transcode(DeflateDecompressor, c) == d
-        @test decompress_bytes(DeflateDecompressorStream, c) == d
+        @test_throws ArgumentError encoder(IOBuffer(d); windowbits=8)
+        @test_throws ArgumentError decoder(IOBuffer(d); windowbits=7)
+        @test_throws ArgumentError encoder(IOBuffer(d); windowbits=16)
+        @test_throws ArgumentError decoder(IOBuffer(d); windowbits=16)
     end
 end
 

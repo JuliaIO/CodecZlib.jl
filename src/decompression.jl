@@ -25,7 +25,7 @@ If `gziponly` is `false`, this codec can decompress the zlib format as well.
 
 Arguments
 ---------
-- `windowbits`: size of history buffer (8..15)
+- `windowbits` (8..15): Changing `windowbits` from its default of 15 will prevent decoding data using a history buffer larger than `2^windowbits`.
 - `gziponly`: flag to inactivate data format detection
 
 !!! warning
@@ -69,7 +69,7 @@ Create a zlib decompression codec.
 
 Arguments
 ---------
-- `windowbits`: size of history buffer (8..15)
+- `windowbits` (8..15): Changing `windowbits` from its default of 15 will prevent decoding data using a history buffer larger than `2^windowbits`.
 
 !!! warning
     `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
@@ -112,7 +112,7 @@ Create a deflate decompression codec.
 
 Arguments
 ---------
-- `windowbits`: size of history buffer (8..15)
+- `windowbits` (8..15): Changing `windowbits` from its default of 15 will prevent decoding data using a history buffer larger than `2^windowbits`.
 
 !!! warning
     `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
