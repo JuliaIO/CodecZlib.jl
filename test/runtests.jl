@@ -329,6 +329,18 @@ end
     local compressed = transcode(ZlibCompressor, uncompressed)
     compressed[70] ⊻= 0x01
     @test_throws ZlibError transcode(ZlibDecompressor, compressed)
+    # Z_NEED_DICT error
+    try
+        transcode(
+            ZlibDecompressor,
+            UInt8[0x78, 0xbb, 0x00, 0x00, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01],
+        )
+    catch e
+        @test e isa ZlibError
+        @test endswith(e.msg, "(code: $(CodecZlib.Z_NEED_DICT))")
+    else
+        @test false
+    end
 end
 @testset "error printing" begin
     @test sprint(Base.showerror, ZlibError("test error message")) ==
