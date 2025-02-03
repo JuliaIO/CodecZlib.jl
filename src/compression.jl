@@ -37,7 +37,9 @@ function GzipCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
     elseif !(9 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 9..15"))
     end
-    return GzipCompressor(ZStream(), level, windowbits+16)
+    zstream = ZStream()
+    finalizer(compress_finalizer!, zstream)
+    return GzipCompressor(zstream, level, windowbits+16)
 end
 
 const GzipCompressorStream{S} = TranscodingStream{GzipCompressor,S} where S<:IO
@@ -85,7 +87,9 @@ function ZlibCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
     elseif !(9 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 9..15"))
     end
-    return ZlibCompressor(ZStream(), level, windowbits)
+    zstream = ZStream()
+    finalizer(compress_finalizer!, zstream)
+    return ZlibCompressor(zstream, level, windowbits)
 end
 
 const ZlibCompressorStream{S} = TranscodingStream{ZlibCompressor,S} where S<:IO
@@ -133,7 +137,9 @@ function DeflateCompressor(;level::Integer=Z_DEFAULT_COMPRESSION,
     elseif !(9 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 9..15"))
     end
-    return DeflateCompressor(ZStream(), level, -Int(windowbits))
+    zstream = ZStream()
+    finalizer(compress_finalizer!, zstream)
+    return DeflateCompressor(zstream, level, -Int(windowbits))
 end
 
 const DeflateCompressorStream{S} = TranscodingStream{DeflateCompressor,S} where S<:IO
@@ -154,17 +160,6 @@ end
 
 # Methods
 # -------
-
-function TranscodingStreams.finalize(codec::CompressorCodec)
-    zstream = codec.zstream
-    if zstream.state != C_NULL
-        code = deflate_end!(zstream)
-        if code != Z_OK
-            zerror(zstream, code)
-        end
-    end
-    return
-end
 
 function TranscodingStreams.startproc(codec::CompressorCodec, state::Symbol, error_ref::Error)
     if codec.zstream.state == C_NULL

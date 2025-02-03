@@ -23,6 +23,18 @@ mutable struct ZStream
     reserved::Culong
 end
 
+@assert typemax(Csize_t) ≥ typemax(Cuint)
+
+function zalloc(::Ptr{Cvoid}, items::Cuint, size::Cuint)::Ptr{Cvoid}
+    s, f = Base.Checked.mul_with_overflow(items, size)
+    if f
+        C_NULL
+    else
+        ccall(:jl_malloc, Ptr{Cvoid}, (Csize_t,), s%Csize_t)
+    end
+end
+zfree(::Ptr{Cvoid}, p::Ptr{Cvoid}) = ccall(:jl_free, Cvoid, (Ptr{Cvoid},), p)
+
 function ZStream()
     ZStream(
         # input
@@ -32,7 +44,9 @@ function ZStream()
         # message and state
         C_NULL, C_NULL,
         # memory allocation
-        C_NULL, C_NULL, C_NULL,
+        @cfunction(zalloc, Ptr{Cvoid}, (Ptr{Cvoid}, Cuint, Cuint)),
+        @cfunction(zfree, Cvoid, (Ptr{Cvoid}, Ptr{Cvoid})),
+        C_NULL,
         # data type, adler and reserved
         0, 0, 0)
 end
@@ -83,6 +97,11 @@ function deflate_end!(zstream::ZStream)
     return ccall((:deflateEnd, libz), Cint, (Ref{ZStream},), zstream)
 end
 
+function compress_finalizer!(zstream::ZStream)
+    deflate_end!(zstream)
+    nothing
+end
+
 function deflate!(zstream::ZStream, flush::Integer)
     return ccall((:deflate, libz), Cint, (Ref{ZStream}, Cint), zstream, flush)
 end
@@ -97,6 +116,11 @@ end
 
 function inflate_end!(zstream::ZStream)
     return ccall((:inflateEnd, libz), Cint, (Ref{ZStream},), zstream)
+end
+
+function decompress_finalizer!(zstream::ZStream)
+    inflate_end!(zstream)
+    nothing
 end
 
 function inflate!(zstream::ZStream, flush::Integer)

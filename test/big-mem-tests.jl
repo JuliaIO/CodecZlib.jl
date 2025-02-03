@@ -6,16 +6,21 @@
 using Test
 using CodecZlib
 
-# Enable this when https://github.com/JuliaIO/CodecZlib.jl/issues/88 is fixed.
-# @testset "memory leak" begin
-#     function foo()
-#         for i in 1:1000000
-#             c = transcode(GzipCompressor(), zeros(UInt8,16))
-#             u = transcode(GzipDecompressor(), c)
-#         end
-#     end
-#     foo()
-# end
+@testset "memory leak" begin
+    function foo()
+        for (encode, decode) in [
+            (GzipCompressor, GzipDecompressor),
+            (ZlibCompressor, ZlibDecompressor),
+            (DeflateCompressor, DeflateDecompressor),
+        ]
+            for i in 1:1000000
+                c = transcode(encode(), zeros(UInt8,16))
+                u = transcode(decode(), c)
+            end
+        end
+    end
+    foo()
+end
 
 @testset "Big Memory Tests" begin
     Sys.WORD_SIZE == 64 || error("tests require 64 bit word size")
