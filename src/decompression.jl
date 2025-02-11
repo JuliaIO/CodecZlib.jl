@@ -35,7 +35,9 @@ function GzipDecompressor(;windowbits::Integer=Z_DEFAULT_WINDOWBITS, gziponly::B
     if !(8 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 8..15"))
     end
-    return GzipDecompressor(ZStream(), windowbits+(gziponly ? 16 : 32))
+    zstream = ZStream()
+    finalizer(decompress_finalizer!, zstream)
+    return GzipDecompressor(zstream, windowbits+(gziponly ? 16 : 32))
 end
 
 const GzipDecompressorStream{S} = TranscodingStream{GzipDecompressor,S} where S<:IO
@@ -78,7 +80,9 @@ function ZlibDecompressor(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(8 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 8..15"))
     end
-    return ZlibDecompressor(ZStream(), windowbits)
+    zstream = ZStream()
+    finalizer(decompress_finalizer!, zstream)
+    return ZlibDecompressor(zstream, windowbits)
 end
 
 const ZlibDecompressorStream{S} = TranscodingStream{ZlibDecompressor,S} where S<:IO
@@ -121,7 +125,9 @@ function DeflateDecompressor(;windowbits::Integer=Z_DEFAULT_WINDOWBITS)
     if !(8 ≤ windowbits ≤ 15)
         throw(ArgumentError("windowbits must be within 8..15"))
     end
-    return DeflateDecompressor(ZStream(), -Int(windowbits))
+    zstream = ZStream()
+    finalizer(decompress_finalizer!, zstream)
+    return DeflateDecompressor(zstream, -Int(windowbits))
 end
 
 const DeflateDecompressorStream{S} = TranscodingStream{DeflateDecompressor,S} where S<:IO
@@ -142,17 +148,6 @@ end
 
 # Methods
 # -------
-
-function TranscodingStreams.finalize(codec::DecompressorCodec)
-    zstream = codec.zstream
-    if zstream.state != C_NULL
-        code = inflate_end!(zstream)
-        if code != Z_OK
-            zerror(zstream, code)
-        end
-    end
-    return
-end
 
 function TranscodingStreams.startproc(codec::DecompressorCodec, ::Symbol, error_ref::Error)
     # indicate that no input data is being provided for future zlib compat
