@@ -118,7 +118,7 @@ struct DeflateCompressor <: CompressorCodec
 end
 
 """
-    DeflateCompressor(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_COMPRESSION))
+    DeflateCompressor(;level=$(Z_DEFAULT_COMPRESSION), windowbits=$(Z_DEFAULT_WINDOWBITS))
 
 Create a deflate compression codec.
 
