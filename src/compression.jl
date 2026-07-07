@@ -35,10 +35,6 @@ const windowbits_docs = """
 const strategy_docs = """
 - `strategy::Integer=$(Z_DEFAULT_STRATEGY)` ($(Z_DEFAULT_STRATEGY)..$(Z_FIXED)): The compression strategy.
 
-  The strategy parameter is used to tune the compression algorithm. It only
-  affects the compression ratio but not the correctness of the compressed
-  output even if it is not set appropriately.
-
   - $(Z_DEFAULT_STRATEGY) (`Z_DEFAULT_STRATEGY`) is used for normal data.
   - $(Z_FILTERED) (`Z_FILTERED`) is used for data produced by a filter (or predictor).
     Filtered data consists mostly of small values with a somewhat random
