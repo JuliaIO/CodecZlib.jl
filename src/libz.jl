@@ -90,13 +90,12 @@ end
 const zlib_version = "1.3.1"
 
 function deflate_init!(zstream::ZStream, level::Integer, windowbits::Integer, strategy::Integer=Z_DEFAULT_STRATEGY)
-    memLevel = Z_DEFAULT_MEMLEVEL # default
     @ccall libz.deflateInit2_(
         zstream::Ref{ZStream},
         level::Cint,
         Z_DEFLATED::Cint,
         windowbits::Cint,
-        memLevel::Cint,
+        Z_DEFAULT_MEMLEVEL::Cint,
         strategy::Cint,
         zlib_version::Cstring,
         sizeof(ZStream)::Cint,
