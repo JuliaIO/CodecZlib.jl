@@ -72,7 +72,11 @@ const Z_FINISH        = Cint(4)
 # The deflate compression method
 const Z_DEFLATED = Cint(8)
 
-const Z_DEFAULT_STRATEGY = Cint(0)
+const Z_FILTERED            = Cint(1)
+const Z_HUFFMAN_ONLY        = Cint(2)
+const Z_RLE                 = Cint(3)
+const Z_FIXED               = Cint(4)
+const Z_DEFAULT_STRATEGY    = Cint(0)
 
 const Z_DEFAULT_MEMLEVEL = Cint(8)
 const Z_DEFAULT_WINDOWBITS = Cint(15)
@@ -85,8 +89,17 @@ end
 # The `_init!` functions will return an error if the library is not compatible.
 const zlib_version = "1.3.1"
 
-function deflate_init!(zstream::ZStream, level::Integer, windowbits::Integer)
-    return ccall((:deflateInit2_, libz), Cint, (Ref{ZStream}, Cint, Cint, Cint, Cint, Cint, Cstring, Cint), zstream, level, Z_DEFLATED, windowbits, #=default memlevel=#8, #=default strategy=#0, zlib_version, sizeof(ZStream))
+function deflate_init!(zstream::ZStream, level::Integer, windowbits::Integer, strategy::Integer=Z_DEFAULT_STRATEGY)
+    @ccall libz.deflateInit2_(
+        zstream::Ref{ZStream},
+        level::Cint,
+        Z_DEFLATED::Cint,
+        windowbits::Cint,
+        Z_DEFAULT_MEMLEVEL::Cint,
+        strategy::Cint,
+        zlib_version::Cstring,
+        sizeof(ZStream)::Cint,
+    )::Cint
 end
 
 function deflate_reset!(zstream::ZStream)

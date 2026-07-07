@@ -4,9 +4,22 @@
 abstract type DecompressorCodec <: TranscodingStreams.Codec end
 
 function Base.show(io::IO, codec::DecompressorCodec)
-    print(io, summary(codec), "(windowbits=$(codec.windowbits))")
+    input_windowbits = mod(abs(codec.windowbits), 16)
+    gziponly = 16 ≤ codec.windowbits ≤ 31
+    print(io, summary(codec))
+    print(io, "(")
+    if input_windowbits != Z_DEFAULT_WINDOWBITS
+        print(io, "windowbits=")
+        print(io, input_windowbits)
+        gziponly && print(io, ", ")
+    end
+    gziponly && print(io, "gziponly=true")
+    print(io, ")")
 end
 
+const decompressor_windowbits_docs = """
+- `windowbits::Integer=$(Z_DEFAULT_WINDOWBITS)` (8..15): Changing `windowbits` from its default of $(Z_DEFAULT_WINDOWBITS) will prevent decoding data using a history buffer larger than `2^windowbits`.
+"""
 
 # Gzip
 # ----
@@ -25,8 +38,8 @@ If `gziponly` is `false`, this codec can decompress the zlib format as well.
 
 Arguments
 ---------
-- `windowbits` (8..15): Changing `windowbits` from its default of 15 will prevent decoding data using a history buffer larger than `2^windowbits`.
-- `gziponly`: flag to inactivate data format detection
+$(decompressor_windowbits_docs)
+- `gziponly::Bool=false`: If `true`, inactivate data format detection.
 
 !!! warning
     `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
@@ -71,7 +84,7 @@ Create a zlib decompression codec.
 
 Arguments
 ---------
-- `windowbits` (8..15): Changing `windowbits` from its default of 15 will prevent decoding data using a history buffer larger than `2^windowbits`.
+$(decompressor_windowbits_docs)
 
 !!! warning
     `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
@@ -116,7 +129,7 @@ Create a deflate decompression codec.
 
 Arguments
 ---------
-- `windowbits` (8..15): Changing `windowbits` from its default of 15 will prevent decoding data using a history buffer larger than `2^windowbits`.
+$(decompressor_windowbits_docs)
 
 !!! warning
     `serialize` and `deepcopy` will not work with this codec due to stored raw pointers.
