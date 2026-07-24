@@ -47,13 +47,11 @@ end
 @testset "Gzip Codec" begin
     codec = GzipCompressor()
     @test codec isa GzipCompressor
-    @test occursin(r"^(CodecZlib\.)?GzipCompressor\(level=-1, windowbits=\d+\)$", sprint(show, codec))
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
     codec = GzipDecompressor()
     @test codec isa GzipDecompressor
-    @test occursin(r"^(CodecZlib\.)?GzipDecompressor\(windowbits=\d+\)$", sprint(show, codec))
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
@@ -149,13 +147,11 @@ end
 @testset "Zlib Codec" begin
     codec = ZlibCompressor()
     @test codec isa ZlibCompressor
-    @test occursin(r"^(CodecZlib\.)?ZlibCompressor\(level=-1, windowbits=\d+\)$", sprint(show, codec))
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
     codec = ZlibDecompressor()
     @test codec isa ZlibDecompressor
-    @test occursin(r"^(CodecZlib\.)?ZlibDecompressor\(windowbits=\d+\)$", sprint(show, codec))
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
@@ -229,13 +225,11 @@ end
 @testset "Deflate Codec" begin
     codec = DeflateCompressor()
     @test codec isa DeflateCompressor
-    @test occursin(r"^(CodecZlib\.)?DeflateCompressor\(level=-1, windowbits=-\d+\)$", sprint(show, codec))
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
     codec = DeflateDecompressor()
     @test codec isa DeflateDecompressor
-    @test occursin(r"^(CodecZlib\.)?DeflateDecompressor\(windowbits=-\d+\)$", sprint(show, codec))
     @test CodecZlib.initialize(codec) === nothing
     @test CodecZlib.finalize(codec) === nothing
 
@@ -396,4 +390,42 @@ end
 @testset "error printing" begin
     @test sprint(Base.showerror, ZlibError("test error message")) ==
         "ZlibError: test error message"
+end
+@testset "show $T" for T in (GzipCompressor, ZlibCompressor, DeflateCompressor)
+    @test repr(T()) == repr(T)*"(level=-1)"
+    for level in 0:9
+        @test repr(T(;level)) == repr(T)*"(level=$(level))"
+    end
+    for windowbits in 9:14
+        @test repr(T(;windowbits)) == repr(T)*"(level=-1, windowbits=$(windowbits))"
+    end
+    for strategy in 1:4
+        @test repr(T(;strategy)) == repr(T)*"(level=-1, strategy=$(strategy))"
+    end
+    @test repr(T(;level=3, windowbits=13, strategy=2)) == repr(T)*"(level=3, windowbits=13, strategy=2)"
+end
+@testset "show $T" for T in (GzipDecompressor, ZlibDecompressor, DeflateDecompressor)
+    @test repr(T()) == repr(T)*"()"
+    for windowbits in 9:14
+        @test repr(T(;windowbits)) == repr(T)*"(windowbits=$(windowbits))"
+    end
+    if T == GzipDecompressor
+        @test repr(T(;gziponly=true)) == repr(T)*"(gziponly=true)"
+        @test repr(T(;gziponly=true, windowbits=10)) == repr(T)*"(windowbits=10, gziponly=true)"
+    end
+end
+@testset "strategy" begin
+    d = generate_data()
+    for (encoder, decoder) in [
+            (GzipCompressorStream, GzipDecompressorStream),
+            (ZlibCompressorStream, ZlibDecompressorStream),
+            (DeflateCompressorStream, DeflateDecompressorStream),
+        ]
+        for strategy in 0:4
+            c = read(encoder(IOBuffer(d); strategy))
+            @test d == read(decoder(IOBuffer(c)))
+        end
+        @test_throws ArgumentError encoder(IOBuffer(d); strategy=-1)
+        @test_throws ArgumentError encoder(IOBuffer(d); strategy=5)
+    end
 end
