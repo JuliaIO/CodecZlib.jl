@@ -4,6 +4,7 @@ using Test
 using Aqua: Aqua
 using TranscodingStreams:
     TranscodingStreams,
+    NoopStream,
     TranscodingStream
 using TestsForCodecPackages:
     test_roundtrip_read,
@@ -256,6 +257,67 @@ end
     c = transcode(DeflateCompressor, d)
     @test transcode(DeflateDecompressor, c) == d
     @test decompress_bytes(DeflateDecompressorStream, c) == d
+end
+
+@testset "Concatenated and embedded streams" begin
+    first = Vector{UInt8}(b"The quick brown fox jumps over the lazy dog.")
+    second = Vector{UInt8}(b"Pack my box with five dozen liquor jugs.")
+    garbage = UInt8[0xf3, 0x1b, 0x33]
+
+    for (Compressor, Decompressor, DecompressorStream) in [
+            (DeflateCompressor, DeflateDecompressor, DeflateDecompressorStream),
+            (ZlibCompressor, ZlibDecompressor, ZlibDecompressorStream),
+            (GzipCompressor, GzipDecompressor, GzipDecompressorStream),
+        ]
+        compressed_first = transcode(Compressor, first)
+        compressed_second = transcode(Compressor, second)
+        concatenated = vcat(compressed_first, compressed_second)
+        with_garbage = vcat(compressed_first, garbage)
+
+        # The default policy is to decode all concatenated streams.
+        @test transcode(Decompressor, concatenated) == vcat(first, second)
+        @test read(DecompressorStream(IOBuffer(concatenated); bufsize=1)) ==
+            vcat(first, second)
+
+        # Exercise stream boundaries by supplying one compressed byte at a time.
+        output = IOBuffer()
+        stream = DecompressorStream(output; bufsize=1)
+        for byte in concatenated
+            write(stream, byte)
+            flush(stream)
+        end
+        write(stream, TranscodingStreams.TOKEN_END)
+        flush(stream)
+        @test take!(output) == vcat(first, second)
+        close(stream)
+
+        # Invalid trailing data is an invalid next stream under that policy.
+        @test_throws ZlibError transcode(Decompressor, with_garbage)
+        @test_throws ZlibError read(
+            DecompressorStream(IOBuffer(with_garbage); bufsize=1),
+        )
+
+        output = IOBuffer()
+        stream = DecompressorStream(output; bufsize=1)
+        @test_throws ZlibError begin
+            for byte in with_garbage
+                write(stream, byte)
+                flush(stream)
+            end
+            write(stream, TranscodingStreams.TOKEN_END)
+            flush(stream)
+        end
+        close(stream)
+
+        # Single-stream mode preserves read-ahead in the shared NoopStream.
+        input = NoopStream(IOBuffer(with_garbage))
+        stream = DecompressorStream(input; bufsize=1, stop_on_end=true)
+        @test read(stream) == first
+        @test eof(stream)
+        close(stream)
+        @test read(input) == garbage
+        close(input)
+    end
 end
 
 @testset "roundtrip windowbits" begin

@@ -38,6 +38,36 @@ compressed = transcode(GzipCompressor, text)
 @assert transcode(GzipDecompressor, compressed) == Vector{UInt8}(text)
 ```
 
+### Concatenated and embedded streams
+
+By default, decompressors process concatenated compressed streams. Bytes after
+the end of a stream are therefore interpreted as the start of another stream,
+and invalid trailing data raises a `ZlibError`.
+
+When a compressed stream is embedded in a larger format, set `stop_on_end=true`
+to stop after the first stream:
+
+```julia
+stream = ZlibDecompressorStream(IOBuffer(compressed_data); stop_on_end=true)
+data = read(stream)
+close(stream)
+```
+
+To preserve and read bytes following the compressed stream, wrap the input in a
+`NoopStream`. This shares the buffering between streams so that bytes read
+ahead by the decompressor remain available:
+
+```julia
+using TranscodingStreams: NoopStream
+
+input = NoopStream(IOBuffer(compressed_data_with_trailing_bytes))
+stream = ZlibDecompressorStream(input; stop_on_end=true)
+data = read(stream)
+close(stream)
+trailing_bytes = read(input)
+close(input)
+```
+
 This package exports following codecs and streams:
 
 | Codec                  | Stream                       |
